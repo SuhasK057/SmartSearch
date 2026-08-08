@@ -4,3 +4,4 @@ config.py
 smartsearch.db
 config.py
 config.py
+__pycache__/
