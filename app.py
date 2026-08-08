@@ -1,121 +1,151 @@
-from flask import Flask, render_template, request, redirect, session
 import requests
-from werkzeug.security import generate_password_hash, check_password_hash
-import sqlite3
-
-from config import TRUSTED_SITES, GOOGLE_API_KEY, GOOGLE_CX_ID, RAPIDAPI_KEY, RAPIDAPI_HOST, SECRET_KEY
-from models import init_db
-
-app = Flask(__name__)
-app.secret_key = SECRET_KEY
-init_db()
-
-def get_db():
-    return sqlite3.connect('smartsearch.db')
-
+from config import GOOGLE_API_KEY, GOOGLE_CX_ID, RAPIDAPI_KEY, RAPIDAPI_HOST
+ 
+ 
+# ---- Trusted Sites Dictionary ----
+# Structure: user_type -> category -> list of domains
+# This is the core "what counts as a trustworthy source" decision.
+TRUSTED_SITES = {
+    "student": {
+        "tutorials": ["geeksforgeeks.org", "w3schools.com", "nptel.ac.in"],
+        "research": ["scholar.google.com", "researchgate.net", "arxiv.org"],
+        "coding_practice": ["leetcode.com", "codeforces.com", "hackerrank.com"],
+        "internships": ["internshala.com", "unstop.com", "linkedin.com"],
+    },
+    "job_seeker": {
+        "jobs": ["linkedin.com", "naukri.com", "indeed.com", "glassdoor.com"],
+        "interview": ["interviewbit.com", "geeksforgeeks.org"],
+    },
+    "farmers": {
+        "prices": ["agmarknet.gov.in", "pmkisan.gov.in"],
+        "news": ["krishijagran.com"],
+    },
+    "sports": {
+        "general": ["espn.com", "skysports.com"],
+        "cricket": ["espncricinfo.com"],
+    },
+    "news": {
+        "general": ["bbc.com", "reuters.com", "thehindu.com", "ndtv.com"],
+        "business": ["economictimes.indiatimes.com"],
+    },
+    "stock_market": {
+        "analysis": ["moneycontrol.com", "economictimes.indiatimes.com"],
+        "data": ["nseindia.com"],
+    },
+    "engineering": {
+        "journals": ["ieee.org", "arxiv.org"],
+        "news": ["techcrunch.com"],
+    },
+    "freelancing": {
+        "platforms": ["upwork.com", "fiverr.com", "freelancer.com"],
+    },
+    "esports": {
+        "news": ["esportsinsider.com"],
+        "stats": ["liquipedia.net"],
+    },
+    "politics": {
+        "wire_services": ["reuters.com", "apnews.com", "ptinews.com"],
+    },
+    "research": {
+        "papers": ["scholar.google.com", "researchgate.net", "arxiv.org"],
+    },
+    "internships": {
+        "listings": ["internshala.com", "unstop.com"],
+    },
+}
+ 
+ 
 def google_search(query, user_type):
+    """
+    Searches Google Custom Search, restricted to trusted sites
+    for the given user_type.
+ 
+    Returns a list of dicts: title, link, snippet, source
+    """
+    if user_type not in TRUSTED_SITES:
+        raise ValueError(f"Unknown user_type: {user_type}")
+ 
     sites = TRUSTED_SITES[user_type]
     all_sites = [site for category in sites.values() for site in category]
     site_filter = " OR ".join([f"site:{s}" for s in all_sites])
     final_query = f"{query} ({site_filter})"
-
+ 
     url = "https://www.googleapis.com/customsearch/v1"
-    params = {'key': GOOGLE_API_KEY, 'cx': GOOGLE_CX_ID, 'q': final_query, 'num': 10}
-    response = requests.get(url, params=params).json()
-
+    params = {
+        'key': GOOGLE_API_KEY,
+        'cx': GOOGLE_CX_ID,
+        'q': final_query,
+        'num': 10
+    }
+ 
+    try:
+        response = requests.get(url, params=params, timeout=10).json()
+    except requests.exceptions.RequestException as e:
+        print(f"[google_search] Request failed: {e}")
+        return []
+ 
     results = []
     if 'items' in response:
         for item in response['items']:
             results.append({
-                'title': item['title'], 'link': item['link'],
-                'snippet': item['snippet'], 'source': item['displayLink']
+                'title': item.get('title'),
+                'link': item.get('link'),
+                'snippet': item.get('snippet'),
+                'source': item.get('displayLink')
+                'image': item.get('pagemap', {}).get('cse_image', [{}])[0].get('src')
             })
+    else:
+        # No 'items' usually means quota hit, bad query, or bad API key
+        print(f"[google_search] No items in response: {response}")
+ 
     return results
-
+ 
+ 
 def job_search(query):
+    """
+    Searches JSearch (RapidAPI) for job listings.
+ 
+    Returns a list of dicts: title, company, link, location
+    """
     url = "https://jsearch.p.rapidapi.com/search"
-    headers = {"X-RapidAPI-Key": RAPIDAPI_KEY, "X-RapidAPI-Host": RAPIDAPI_HOST}
+    headers = {
+        "X-RapidAPI-Key": RAPIDAPI_KEY,
+        "X-RapidAPI-Host": RAPIDAPI_HOST
+    }
     params = {"query": query, "page": "1", "num_pages": "1"}
-    response = requests.get(url, headers=headers, params=params).json()
-
+ 
+    try:
+        response = requests.get(url, headers=headers, params=params, timeout=10).json()
+    except requests.exceptions.RequestException as e:
+        print(f"[job_search] Request failed: {e}")
+        return []
+ 
     results = []
     if 'data' in response:
         for job in response['data']:
             results.append({
-                'title': job.get('job_title'), 'company': job.get('employer_name'),
-                'link': job.get('job_apply_link'), 'location': job.get('job_city', 'Remote')
+                'title': job.get('job_title'),
+                'company': job.get('employer_name'),
+                'link': job.get('job_apply_link'),
+                'location': job.get('job_city', 'Remote')
             })
-    return results
-
-@app.route('/')
-def home():
-    return render_template('home.html')
-
-@app.route('/search', methods=['POST'])
-def search():
-    user_type = request.form.get('user_type')
-    query = request.form.get('query')
-    if user_type == 'job_seeker':
-        results = job_search(query)
     else:
-        results = google_search(query, user_type)
-    return render_template('results.html', results=results, query=query)
-
-@app.route('/signup', methods=['GET', 'POST'])
-def signup():
-    if request.method == 'POST':
-        username = request.form['username']
-        password_hash = generate_password_hash(request.form['password'])
-        conn = get_db()
-        try:
-            conn.execute('INSERT INTO users (username, password_hash) VALUES (?, ?)', (username, password_hash))
-            conn.commit()
-        except sqlite3.IntegrityError:
-            return "Username already taken"
-        conn.close()
-        return redirect('/login')
-    return render_template('signup.html')
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        conn = get_db()
-        user = conn.execute('SELECT id, password_hash FROM users WHERE username = ?',
-                             (request.form['username'],)).fetchone()
-        conn.close()
-        if user and check_password_hash(user[1], request.form['password']):
-            session['user_id'] = user[0]
-            session['username'] = request.form['username']
-            return redirect('/')
-        return "Invalid login"
-    return render_template('login.html')
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect('/')
-
-@app.route('/save-job', methods=['POST'])
-def save_job():
-    if 'user_id' not in session:
-        return redirect('/login')
-    conn = get_db()
-    conn.execute('INSERT INTO saved_jobs (user_id, title, company, link, location) VALUES (?, ?, ?, ?, ?)',
-                 (session['user_id'], request.form['title'], request.form['company'],
-                  request.form['link'], request.form['location']))
-    conn.commit()
-    conn.close()
-    return redirect('/saved-jobs')
-
-@app.route('/saved-jobs')
-def saved_jobs():
-    if 'user_id' not in session:
-        return redirect('/login')
-    conn = get_db()
-    jobs = conn.execute('SELECT title, company, link, location FROM saved_jobs WHERE user_id = ?',
-                         (session['user_id'],)).fetchall()
-    conn.close()
-    return render_template('saved_jobs.html', jobs=jobs)
-
+        print(f"[job_search] No data in response: {response}")
+ 
+    return results
+ 
+ 
+# ---- Standalone test — run this file directly to sanity-check your APIs ----
+# python search_engine.py
 if __name__ == '__main__':
-    app.run(debug=True)
+    print("Testing google_search()...")
+    results = google_search("python tutorials", "student")
+    print(f"Got {len(results)} results")
+    for r in results[:3]:
+        print(r)
+ 
+    print("\nTesting job_search()...")
+    jobs = job_search("developer jobs in chicago")
+    print(f"Got {len(jobs)} results")
+    for j in jobs[:3]:
+        print(j)
