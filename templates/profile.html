@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>NewsSphere - Profile</title>
+
+    <!-- ================= FONT AWESOME ================= -->
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+    <style>
+
+        /* ================= GENERAL ================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffffff,
+                    #f3efff
+                );
+
+            color: #29213f;
+        }
+
+
+        /* ================= NAVBAR ================= */
+
+        .navbar {
+            height: 70px;
+
+            background: #13082a;
+
+            display: flex;
+
+            align-items: center;
+
+            padding: 0 45px;
+
+            border-bottom: 2px solid #eee8ff;
+
+            box-shadow:
+                0 3px 15px
+                rgba(88, 61, 135, 0.08);
+        }
+
+
+        /* ================= LOGO ================= */
+
+        .logo {
+            display: flex;
+
+            align-items: center;
+
+            font-family: Georgia,
+                "Times New Roman",
+                serif;
+
+            font-size: 30px;
+
+            font-weight: bold;
+        }
+
+
+        .logo i {
+            color: #693bd0;
+
+            font-size: 30px;
+
+            margin-right: 12px;
+        }
+
+
+        .news {
+            color: #F1EFFF;
+
+            font-family: Georgia,
+                "Times New Roman",
+                Times,
+                serif !important;
+        }
+
+
+        .sphere {
+            color: #693bd0;
+
+            font-family: Georgia,
+                "Times New Roman",
+                Times,
+                serif !important;
+        }
+
+
+        /* ================= MAIN CONTAINER ================= */
+
+        .container {
+            max-width: 1200px;
+
+            margin: 0 auto;
+
+            padding: 25px 30px;
+        }
+
+
+        /* ================= PAGE TITLE ================= */
+
+        .page-title {
+            text-align: center;
+
+            margin-bottom: 22px;
+        }
+
+
+        .page-title h1 {
+            color: #4d278f;
+
+            font-size: 30px;
+        }
+
+
+        .page-title p {
+            color: #777;
+
+            margin-top: 5px;
+
+            font-size: 14px;
+        }
+
+
+        /* ================= PROFILE LAYOUT ================= */
+
+        .profile-layout {
+            display: grid;
+
+            grid-template-columns: 340px 1fr;
+
+            gap: 25px;
+
+            align-items: stretch;
+        }
+
+
+        /* ================= PROFILE CARD ================= */
+
+        .profile-card {
+            background: white;
+
+            border-radius: 22px;
+
+            padding: 30px 25px;
+
+            text-align: center;
+
+            box-shadow:
+                0 10px 30px
+                rgba(91, 55, 145, 0.12);
+
+            border: 1px solid #eee7ff;
+
+            position: relative;
+
+            overflow: hidden;
+        }
+
+
+        .profile-card::before {
+            content: "";
+
+            position: absolute;
+
+            top: 0;
+            left: 0;
+            right: 0;
+
+            height: 6px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #6c3ed1,
+                    #a37bea
+                );
+        }
+
+
+        /* ================= AVATAR ================= */
+
+        .avatar {
+            width: 125px;
+
+            height: 125px;
+
+            margin: 12px auto 18px;
+
+            border-radius: 50%;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #693bd0,
+                    #a982f1
+                );
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            color: white;
+
+            font-size: 55px;
+
+            border: 6px solid #f0eaff;
+
+            box-shadow:
+                0 8px 20px
+                rgba(100, 58, 190, 0.25);
+        }
+
+
+        .profile-card h2 {
+            font-size: 23px;
+
+            color: #39205f;
+
+            margin-bottom: 5px;
+
+            word-break: break-word;
+        }
+
+
+        .username {
+            color: #7654ad;
+
+            font-size: 14px;
+
+            margin-bottom: 14px;
+        }
+
+
+        .bio {
+            color:black;
+
+            font-size: 14px;
+
+            line-height: 1.5;
+
+            margin: 0 auto 25px;
+
+            max-width: 270px;
+        }
+
+
+        /* ================= EDIT BUTTON ================= */
+
+        .edit-btn {
+            width: 100%;
+
+            padding: 12px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #6c3ed1,
+                    #8c60e2
+                );
+
+            color: white;
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+        }
+
+
+        .edit-btn:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 7px 18px
+                rgba(108, 62, 209, 0.3);
+        }
+
+
+        .edit-btn i {
+            margin-right: 7px;
+        }
+
+
+        /* ================= INFORMATION CARD ================= */
+
+        .info-card {
+            background: white;
+
+            border-radius: 22px;
+
+            padding: 28px;
+
+            box-shadow:
+                0 10px 30px
+                rgba(91, 55, 145, 0.12);
+
+            border: 1px solid #eee7ff;
+        }
+
+
+        /* ================= SECTION TITLE ================= */
+
+        .section-title {
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            color: #4d278f;
+
+            font-size: 20px;
+
+            margin-bottom: 22px;
+        }
+
+
+        .section-title i {
+            width: 38px;
+
+            height: 38px;
+
+            border-radius: 10px;
+
+            background: #f0eaff;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            color: #6c3ed1;
+        }
+
+
+        /* ================= INFORMATION GRID ================= */
+
+        .info-grid {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 15px;
+        }
+
+
+        .info-item {
+            background:
+                linear-gradient(
+                    135deg,
+                    #faf8ff,
+                    #f5f0ff
+                );
+
+            border: 1px solid #ece4ff;
+
+            border-radius: 14px;
+
+            padding: 15px;
+
+            min-height: 82px;
+
+            transition: 0.25s;
+        }
+
+
+        .info-item:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 5px 15px
+                rgba(95, 54, 155, 0.08);
+        }
+
+
+        .info-label {
+            font-size: 12px;
+
+            color: #8566b0;
+
+            margin-bottom: 7px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 7px;
+        }
+
+
+        .info-label i {
+            color: #7044d9;
+        }
+
+
+        .info-value {
+            font-size: 14px;
+
+            font-weight: 600;
+
+            color: #302044;
+
+            word-break: break-word;
+        }
+
+
+        /* ================= MODAL ================= */
+
+        .modal {
+            display: none;
+
+            position: fixed;
+
+            z-index: 1000;
+
+            inset: 0;
+
+            background:
+                rgba(39, 22, 64, 0.45);
+
+            backdrop-filter: blur(5px);
+
+            justify-content: center;
+
+            align-items: center;
+
+            padding: 20px;
+
+            overflow-y: auto;
+        }
+
+
+        .modal.active {
+            display: flex;
+        }
+
+
+        .modal-box {
+            width: 450px;
+
+            max-width: 100%;
+
+            max-height: 90vh;
+
+            overflow-y: auto;
+
+            background: white;
+
+            border-radius: 20px;
+
+            padding: 24px;
+
+            box-shadow:
+                0 20px 60px
+                rgba(40, 20, 70, 0.25);
+
+            animation: popup 0.25s ease;
+        }
+
+
+        @keyframes popup {
+
+            from {
+                opacity: 0;
+
+                transform: scale(0.92);
+            }
+
+            to {
+                opacity: 1;
+
+                transform: scale(1);
+            }
+        }
+
+
+        /* ================= MODAL HEADER ================= */
+
+        .modal-header {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 22px;
+        }
+
+
+        .modal-header h2 {
+            color: #4d278f;
+        }
+
+
+        .close-btn {
+            width: 35px;
+
+            height: 35px;
+
+            border: none;
+
+            border-radius: 50%;
+
+            background: #f3edff;
+
+            color: #6335b5;
+
+            cursor: pointer;
+
+            font-size: 16px;
+        }
+
+
+        .close-btn:hover {
+            background: #e6dcff;
+        }
+
+
+        /* ================= FORM ================= */
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+
+        .form-group label {
+            display: block;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            color: #5c467d;
+
+            margin-bottom: 6px;
+        }
+
+
+        .form-group input,
+        .form-group select {
+
+            width: 100%;
+
+            padding: 11px 13px;
+
+            border: 1px solid #ddd2f3;
+
+            border-radius: 10px;
+
+            outline: none;
+
+            font-size: 14px;
+
+            color: #302044;
+
+            background: #fcfaff;
+        }
+
+
+        .form-group input:focus,
+        .form-group select:focus {
+
+            border-color: #7650d2;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(118, 80, 210, 0.1);
+        }
+
+
+        .form-group select {
+            cursor: pointer;
+        }
+
+
+        /* ================= MODAL BUTTONS ================= */
+
+        .modal-buttons {
+            display: flex;
+
+            gap: 10px;
+
+            margin-top: 20px;
+        }
+
+
+        .save-btn,
+        .cancel-btn {
+
+            flex: 1;
+
+            padding: 11px;
+
+            border-radius: 10px;
+
+            cursor: pointer;
+
+            font-weight: 600;
+
+            font-size: 14px;
+        }
+
+
+        .save-btn {
+
+            border: none;
+
+            background: #6c3ed1;
+
+            color: white;
+        }
+
+
+        .save-btn:hover {
+            background: #5930b3;
+        }
+
+
+        .cancel-btn {
+
+            background: white;
+
+            color: #6335b5;
+
+            border: 1px solid #d9c9f5;
+        }
+
+
+        .cancel-btn:hover {
+            background: #f7f2ff;
+        }
+ /* ================= NEXT BUTTON ================= */
+
+.next-btn {
+    position: fixed;
+    right: 25px;
+    bottom: 20px;
+
+    padding: 12px 28px;
+
+    border: none;
+    border-radius: 12px;
+
+    background: linear-gradient(135deg, #6c3ed1, #8c60e2);
+    color: white;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    box-shadow: 0 6px 18px rgba(108, 62, 209, 0.3);
+
+    z-index: 9999;
+
+    transition: 0.3s;
+}
+
+.next-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(108, 62, 209, 0.4);
+}
+
+.next-btn i {
+    margin-left: 8px;
+}
+
+
+/* ================= NO PAGE SCROLL ================= */
+
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+}
+
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 850px) {
+
+            .profile-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-card {
+                max-width: 500px;
+
+                width: 100%;
+
+                margin: auto;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+
+        @media (max-width: 600px) {
+
+            .navbar {
+                padding: 0 20px;
+            }
+
+            .container {
+                padding: 20px 15px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title h1 {
+                font-size: 26px;
+            }
+
+            .modal-box {
+                padding: 22px;
+            }
+
+            .modal-buttons {
+                flex-direction: column;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ================= NAVBAR ================= -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+
+            <i class="fa-solid fa-globe"></i>
+
+            <span class="news">News</span>
+
+            <span class="sphere">Sphere</span>
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- ================= MAIN ================= -->
+
+    <div class="container">
+
+
+        <!-- ================= PAGE TITLE ================= -->
+
+        <div class="page-title">
+
+            <h1>My Profile</h1>
+
+            <p>
+                Manage your NewsSphere profile
+                and personal information
+            </p>
+
+        </div>
+
+
+
+        <!-- ================= PROFILE LAYOUT ================= -->
+
+        <div class="profile-layout">
+
+
+            <!-- ================= LEFT CARD ================= -->
+
+            <div class="profile-card">
+
+                <div class="avatar">
+
+                    <i class="fa-solid fa-user"></i>
+
+                </div>
+
+
+                <h2 id="profileName">
+                    Your Name
+                </h2>
+                <br>
+
+
+                <p class="bio">
+
+                  “Stay curious, stay informed, and discover stories and ideas that matter to you.”
+
+                </p>
+
+
+                <button
+                    class="edit-btn"
+                    onclick="openEdit()">
+
+                    <i class="fa-solid fa-pen"></i>
+
+                    Edit Profile
+
+                </button>
+
+            </div>
+
+
+
+            <!-- ================= INFORMATION CARD ================= -->
+
+            <div class="info-card">
+
+
+                <div class="section-title">
+
+                    <span>
+                        Personal Information
+                    </span>
+
+                </div>
+
+
+
+                <div class="info-grid">
+
+
+                    <!-- FULL NAME -->
+
+                    <div class="info-item">
+
+                        <div class="info-label">
+
+                            <i class="fa-solid fa-user"></i>
+
+                            Full Name
+
+                        </div>
+
+                        <div
+                            class="info-value"
+                            id="fullName">
+
+                            Enter your name
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- EMAIL -->
+
+                    <div class="info-item">
+
+                        <div class="info-label">
+
+                            <i class="fa-solid fa-envelope"></i>
+
+                            Email Address
+
+                        </div>
+
+                        <div
+                            class="info-value"
+                            id="email">
+
+                            Enter your email address
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- PHONE -->
+
+                    <div class="info-item">
+
+                        <div class="info-label">
+
+                            <i class="fa-solid fa-phone"></i>
+
+                            Phone Number
+
+                        </div>
+
+                        <div
+                            class="info-value"
+                            id="phone">
+
+                            Enter your phone number
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- EDUCATION -->
+
+                    <div class="info-item">
+
+                        <div class="info-label">
+
+                            <i class="fa-solid fa-graduation-cap"></i>
+
+                            Education
+
+                        </div>
+
+                        <div
+                            class="info-value"
+                            id="education">
+
+                            Enter your education
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- PROFESSION -->
+
+                    <div class="info-item">
+
+                        <div class="info-label">
+
+                            <i class="fa-solid fa-laptop-code"></i>
+
+                            Profession
+
+                        </div>
+
+                        <div
+                            class="info-value"
+                            id="profession">
+
+                            Enter your profession
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- AGE -->
+
+                    <div class="info-item">
+
+                        <div class="info-label">
+
+                            <i class="fa-solid fa-calendar"></i>
+
+                            Age
+
+                        </div>
+
+                        <div
+                            class="info-value"
+                            id="age">
+
+                            Enter your age
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- GENDER -->
+
+                    <div class="info-item">
+
+                        <div class="info-label">
+
+                            <i class="fa-solid fa-venus-mars"></i>
+
+                            Gender (Optional)
+
+                        </div>
+
+                        <div
+                            class="info-value"
+                            id="gender">
+
+                            Not specified
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- LOCATION -->
+
+                    <div class="info-item">
+
+                        <div class="info-label">
+
+                            <i class="fa-solid fa-location-dot"></i>
+
+                            Location
+
+                        </div>
+
+                        <div
+                            class="info-value"
+                            id="location">
+
+                            Enter your location
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+        <!-- ================= NEXT BUTTON ================= -->
+
+<div class="next-section">
+
+    <button
+        type="button"
+        class="next-btn"
+        onclick="goToNextPage()">
+
+        Next
+        <i class="fa-solid fa-arrow-right"></i>
+
+    </button>
+
+</div>
+
+    <!-- ================================================= -->
+    <!-- EDIT PROFILE MODAL -->
+    <!-- ================================================= -->
+
+    <div
+        class="modal"
+        id="editModal">
+
+
+        <div class="modal-box">
+
+
+            <div class="modal-header">
+
+                <h2>
+                    Edit Profile
+                </h2>
+
+                <button
+                    class="close-btn"
+                    onclick="closeEdit()">
+
+                    <i class="fa-solid fa-xmark"></i>
+
+                </button>
+
+            </div>
+
+
+
+            <!-- LAST NAME -->
+
+            <div class="form-group">
+
+                <label>
+                    Last Name
+                </label>
+
+                <input
+                    type="text"
+                    id="editLastName"
+                    placeholder="Enter your last name"
+                    autocomplete="off">
+
+            </div>
+
+
+
+            <!-- FIRST NAME -->
+
+            <div class="form-group">
+
+                <label>
+                    First Name
+                </label>
+
+                <input
+                    type="text"
+                    id="editFirstName"
+                    placeholder="Enter your first name"
+                    autocomplete="off">
+
+            </div>
+
+
+
+            <!-- MIDDLE NAME -->
+
+            <div class="form-group">
+
+                <label>
+                    Middle Name
+                </label>
+
+                <input
+                    type="text"
+                    id="editMiddleName"
+                    placeholder="Enter your middle name"
+                    autocomplete="off">
+
+            </div>
+
+
+
+            <!-- EMAIL -->
+
+            <div class="form-group">
+
+                <label>
+                    Email Address
+                </label>
+
+                <input
+                    type="email"
+                    id="editEmail"
+                    placeholder="Enter your email address"
+                    autocomplete="off">
+
+            </div>
+
+
+
+            <!-- PHONE -->
+
+            <div class="form-group">
+
+                <label>
+                    Phone Number
+                </label>
+
+                <input
+                    type="text"
+                    id="editPhone"
+                    placeholder="Enter your phone number"
+                    autocomplete="off">
+
+            </div>
+
+
+
+            <!-- AGE -->
+
+            <div class="form-group">
+
+                <label>
+                    Age
+                </label>
+
+                <input
+                    type="number"
+                    id="editAge"
+                    placeholder="Enter your age"
+                    autocomplete="off">
+
+            </div>
+
+
+
+            <!-- GENDER -->
+
+            <div class="form-group">
+
+                <label>
+                    Gender (Optional)
+                </label>
+
+                <select id="editGender">
+
+                    <option value="">
+                        Prefer not to say
+                    </option>
+
+                    <option value="Male">
+                        Male
+                    </option>
+
+                    <option value="Female">
+                        Female
+                    </option>
+
+                    <option value="Transgender">
+                        Transgender
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- EDUCATION -->
+
+            <div class="form-group">
+
+                <label>
+                    Education
+                </label>
+
+                <input
+                    type="text"
+                    id="editEducation"
+                    placeholder="Enter your education"
+                    autocomplete="off">
+
+            </div>
+
+
+
+            <!-- PROFESSION -->
+
+            <div class="form-group">
+
+                <label>
+                    Profession
+                </label>
+
+                <input
+                    type="text"
+                    id="editProfession"
+                    placeholder="Enter your profession"
+                    autocomplete="off">
+
+            </div>
+
+
+
+            <!-- LOCATION -->
+
+            <div class="form-group">
+
+                <label>
+                    Location
+                </label>
+
+                <input
+                    type="text"
+                    id="editLocation"
+                    placeholder="Enter your location"
+                    autocomplete="off">
+
+            </div>
+
+
+
+            <!-- BUTTONS -->
+
+            <div class="modal-buttons">
+
+                <button
+                    class="cancel-btn"
+                    onclick="closeEdit()">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    class="save-btn"
+                    onclick="saveProfile()">
+
+                    <i class="fa-solid fa-check"></i>
+
+                    Save Changes
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+<!-- ================================================= -->
+<!-- JAVASCRIPT -->
+<!-- ================================================= -->
+
+    <script>
+
+/* =================================================
+   PROFILE DATA
+================================================= */
+
+let profile = {
+
+    lastName: "",
+    firstName: "",
+    middleName: "",
+
+    email: "",
+    phone: "",
+
+    age: "",
+    gender: "",
+
+    education: "",
+    profession: "",
+    location: ""
+
+};
+
+
+/* =================================================
+   CREATE FULL NAME
+================================================= */
+
+function getFullName() {
+
+    return [
+
+        profile.lastName,
+        profile.firstName,
+        profile.middleName
+
+    ]
+
+    .filter(function(name) {
+
+        return name.trim() !== "";
+
+    })
+
+    .join(" ");
+
+}
+
+
+/* =================================================
+   LOAD PROFILE ON PAGE
+================================================= */
+
+function loadProfile() {
+
+    const fullName = getFullName();
+
+
+    document.getElementById("profileName").textContent =
+        fullName || "Your Name";
+
+
+    document.getElementById("fullName").textContent =
+        fullName || "Enter your name";
+
+
+    document.getElementById("email").textContent =
+        profile.email ||
+        "Enter your email address";
+
+
+    document.getElementById("phone").textContent =
+        profile.phone ||
+        "Enter your phone number";
+
+
+    document.getElementById("education").textContent =
+        profile.education ||
+        "Enter your education";
+
+
+    document.getElementById("profession").textContent =
+        profile.profession ||
+        "Enter your profession";
+
+
+    document.getElementById("age").textContent =
+        profile.age ||
+        "Enter your age";
+
+
+    document.getElementById("gender").textContent =
+        profile.gender ||
+        "Not specified";
+
+
+    document.getElementById("location").textContent =
+        profile.location ||
+        "Enter your location";
+
+}
+
+
+/* =================================================
+   OPEN EDIT PROFILE
+================================================= */
+
+function openEdit() {
+
+    document.getElementById("editLastName").value = "";
+
+    document.getElementById("editFirstName").value = "";
+
+    document.getElementById("editMiddleName").value = "";
+
+    document.getElementById("editEmail").value = "";
+
+    document.getElementById("editPhone").value = "";
+
+    document.getElementById("editAge").value = "";
+
+    document.getElementById("editGender").value = "";
+
+    document.getElementById("editEducation").value = "";
+
+    document.getElementById("editProfession").value = "";
+
+    document.getElementById("editLocation").value = "";
+
+
+    document.getElementById("editModal")
+        .classList.add("active");
+
+}
+
+
+/* =================================================
+   CLOSE EDIT PROFILE
+================================================= */
+
+function closeEdit() {
+
+    document.getElementById("editModal")
+        .classList.remove("active");
+
+}
+
+
+/* =================================================
+   SAVE PROFILE
+================================================= */
+
+function saveProfile() {
+
+    const lastName =
+        document.getElementById("editLastName")
+        .value.trim();
+
+
+    const firstName =
+        document.getElementById("editFirstName")
+        .value.trim();
+
+
+    const middleName =
+        document.getElementById("editMiddleName")
+        .value.trim();
+
+
+    const email =
+        document.getElementById("editEmail")
+        .value.trim();
+
+
+    const phone =
+        document.getElementById("editPhone")
+        .value.trim();
+
+
+    const age =
+        document.getElementById("editAge")
+        .value.trim();
+
+
+    const gender =
+        document.getElementById("editGender")
+        .value;
+
+
+    const education =
+        document.getElementById("editEducation")
+        .value.trim();
+
+
+    const profession =
+        document.getElementById("editProfession")
+        .value.trim();
+
+
+    const location =
+        document.getElementById("editLocation")
+        .value.trim();
+
+
+    /* ================= VALIDATION ================= */
+
+    if (firstName === "") {
+
+        alert("Please enter your first name.");
+
+        return;
+
+    }
+
+
+    if (email === "") {
+
+        alert("Please enter your email.");
+
+        return;
+
+    }
+
+
+    if (phone === "") {
+
+        alert("Please enter your phone number.");
+
+        return;
+
+    }
+
+
+    /* ================= UPDATE PROFILE ================= */
+
+    profile = {
+
+        lastName: lastName,
+
+        firstName: firstName,
+
+        middleName: middleName,
+
+        email: email,
+
+        phone: phone,
+
+        age: age,
+
+        gender: gender,
+
+        education: education,
+
+        profession: profession,
+
+        location: location
+
+    };
+
+
+    /* ================= UPDATE PAGE ================= */
+
+    loadProfile();
+
+
+    /* ================= CLOSE MODAL ================= */
+
+    closeEdit();
+
+
+    /* ================= SUCCESS MESSAGE ================= */
+
+    alert("Profile updated successfully!");
+
+}
+
+
+/* =================================================
+   NEXT BUTTON
+================================================= */
+
+function goToNextPage() {
+
+    /* ================= CHECK REQUIRED FIELDS ================= */
+
+    if (
+
+        !profile.firstName ||
+        !profile.email ||
+        !profile.phone ||
+        !profile.age ||
+        !profile.education ||
+        !profile.profession ||
+        !profile.location
+
+    ) {
+
+        alert(
+            "Please complete your profile before going to the next page."
+        );
+
+        openEdit();
+
+        return;
+
+    }
+
+
+    /* ================= GO TO HOME PAGE ================= */
+
+    window.location.href = "/domain";
+
+}
+
+
+/* =================================================
+   CLICK OUTSIDE MODAL
+================================================= */
+
+document.getElementById("editModal")
+    .addEventListener(
+        "click",
+        function(event) {
+
+            if (event.target === this) {
+
+                closeEdit();
+
+            }
+
+        }
+    );
+
+
+/* =================================================
+   INITIAL PAGE LOAD
+================================================= */
+
+loadProfile();
+
+</script>
+
+</body>
+
+</html>

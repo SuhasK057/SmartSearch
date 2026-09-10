@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly News Portal</title>
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar">
+
+  <div class="logo">
+
+    <i class="fa-solid fa-globe"></i>
+
+    <span class="newssphere">
+        <span class="news">News</span><span class="sphere">Sphere</span>
+    </span>
+
+   </div>
+
+    <div class="search-box">
+        <input type="text" placeholder="Search news...">
+    </div>
+
+    <div class="nav-icons">
+
+        <i class="fa-solid fa-bell"></i>
+
+        <i class="fa-solid fa-bookmark"></i>
+
+        
+    </div><div class="profile-menu">
+
+    <i class="fa-solid fa-user profile-icon"></i>
+
+    <div class="profile-dropdown">
+
+        <a href="#">
+            <i class="fa-solid fa-user"></i>
+            My Profile
+        </a>
+
+        <a href="#">
+            <i class="fa-solid fa-pen"></i>
+            Edit Profile
+        </a>
+
+        <a href="#">
+            <i class="fa-solid fa-bell"></i>
+            Notifications
+        </a>
+
+        <a href="#">
+            <i class="fa-solid fa-gear"></i>
+            Settings
+        </a>
+
+        <a href="#">
+            <i class="fa-solid fa-circle-question"></i>
+            Help & Support
+        </a>
+
+        <hr>
+
+        <a href="#" class="logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Logout
+        </a>
+
+    </div>
+
+</div>
+
+</nav>
+
+<!-- ================= MAIN ================= -->
+
+<div class="container">
+
+<!-- LEFT SIDEBAR -->
+
+<div class="left-sidebar">
+
+<ul>
+
+<li><i class="fa-solid fa-house"></i> Home</li>
+
+<li><i class="fa-solid fa-briefcase"></i> Jobs</li>
+
+<li><i class="fa-solid fa-microchip"></i> Technology</li>
+
+<li><i class="fa-solid fa-graduation-cap"></i> Education</li>
+
+<li><i class="fa-solid fa-heart"></i> Health</li>
+
+<li><i class="fa-solid fa-chart-line"></i>Economy & Stock</li>
+
+<li><i class="fa-solid fa-landmark"></i>Politics</li>
+
+<li><i class="fa-solid fa-film"></i> Entertainment</li>
+
+<li> <i class="fa-solid fa-futbol"></i>Sports</li>
+
+
+</ul>
+
+</div>
+
+<!-- NEWS FEED -->
+
+<div class="feed">
+
+<div class="selected-domain">
+    <h2>
+        {{ selected_domain|replace('_', ' ')|title }} News
+    </h2>
+</div>
+
+<div class="card">
+
+<div class="card-header">
+ 
+<img src="https://i.pravatar.cc/50?random=1" alt="Profile">
+
+<div>
+
+<h3>Job Alert</h3>
+
+<small>2 hours ago</small>
+
+</div>
+
+</div>
+
+<img src="https://picsum.photos/700/350?1">
+
+<h2>Google Hiring Freshers 2026</h2>
+
+<p>
+
+Google announced new openings for software engineers.
+
+Students from all branches can apply.
+
+</p>
+
+<div class="buttons">
+
+<button class="like">
+
+<i class="fa-regular fa-heart"></i>
+
+Like
+
+</button>
+
+<button class="save">
+
+<i class="fa-regular fa-bookmark"></i>
+
+Save
+
+</button>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="card-header">
+    
+<img src="https://i.pravatar.cc/44">
+
+<div>
+
+<h3>Technology</h3>
+
+<small>5 hours ago</small>
+
+</div>
+
+</div>
+
+<img src="https://picsum.photos/700/350?2">
+
+<h2>New AI Tool Released</h2>
+
+<p>
+
+Artificial Intelligence is helping students prepare
+
+for placements and interviews.
+
+</p>
+
+<div class="buttons">
+
+<button class="like">
+
+<i class="fa-regular fa-heart"></i>
+
+Like
+
+</button>
+
+<button class="save">
+
+<i class="fa-regular fa-bookmark"></i>
+
+Save
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- RIGHT SIDEBAR -->
+
+<div class="right-sidebar">
+
+<h2>Trending</h2>
+
+<p>#Jobs</p>
+
+<p>#AI</p>
+
+<p>#ISRO</p>
+
+<p>#Google</p>
+
+<p>#Scholarship</p>
+
+<hr>
+
+<h2>Recommended</h2>
+
+<p>Latest News</p>
+
+<p>Top stories</p>
+
+<p>World News</p>
+
+<p>Top updates</p>
+
+</div>
+
+</div>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>

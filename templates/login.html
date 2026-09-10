@@ -309,7 +309,7 @@
   <a href="#">About</a>
   <a href="#">Services</a>
   <a href="#">Contact</a>
-  <a href="#" class="contact-btn">Login</a>
+  <a href="/" class="contact-btn">Login</a>
 </nav>
 
 <div class="stage">
@@ -413,12 +413,11 @@
     submitBtn.disabled = true;
     submitBtn.textContent = 'Signing in...';
 
-    setTimeout(() => {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Login';
-      statusMsg.textContent = `Signed in successfully as ${emailVal}.`;
-      statusMsg.classList.add('show', 'success');
-    }, 900);
+   setTimeout(() => {
+
+  window.location.href = "/profile";
+
+}, 900);
   });
 </script>
 
