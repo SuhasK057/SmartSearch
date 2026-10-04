@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register</title>
+<style>
+  /* ===== Identical look-and-feel to login.html ===== */
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    position: relative;
+    overflow-x: hidden;
+    color: #fff;
+  }
+
+  .backdrop {
+    position: fixed; inset: 0; z-index: -3;
+    background: linear-gradient(180deg, #0a1130 0%, #16234f 35%, #2a4370 65%, #3f5a86 100%);
+  }
+
+  .stars {
+    position: fixed; inset: 0; z-index: -2;
+    background-image:
+      radial-gradient(1.5px 1.5px at 10% 15%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 25%  8%, #fff, transparent),
+      radial-gradient(1px   1px   at 40% 20%, #cdd8ff, transparent),
+      radial-gradient(1.5px 1.5px at 60% 10%, #fff, transparent),
+      radial-gradient(1px   1px   at 75% 25%, #cdd8ff, transparent),
+      radial-gradient(1.5px 1.5px at 85% 12%, #fff, transparent),
+      radial-gradient(1px   1px   at 95% 30%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 15% 40%, #fff, transparent),
+      radial-gradient(1px   1px   at 50%  5%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 30% 35%, #cdd8ff, transparent);
+    background-repeat: repeat;
+    background-size: 100% 45%;
+    opacity: 0.9;
+  }
+
+  .shooting-star {
+    position: fixed; width: 140px; height: 2px;
+    background: linear-gradient(90deg, #fff, transparent);
+    top: 12%; left: -10%; z-index: -1;
+    transform: rotate(25deg);
+    animation: shoot 6s linear infinite;
+    opacity: 0;
+  }
+  .shooting-star.s2 { top: 22%; animation-delay: 2.3s; }
+  .shooting-star.s3 { top:  6%; animation-delay: 4.1s; }
+
+  @keyframes shoot {
+    0%   { transform: translate(0,0) rotate(25deg); opacity: 0; }
+    5%   { opacity: 1; }
+    25%  { transform: translate(120vw, 60vh) rotate(25deg); opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  .skyline {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    height: 34%; z-index: -1;
+    background:
+      linear-gradient(0deg, rgba(4,8,25,0.95), rgba(4,8,25,0.4)),
+      repeating-linear-gradient(90deg,
+        #0d1530 0px,   #0d1530 60px,
+        #131c3d 60px,  #131c3d 130px,
+        #0a1030 130px, #0a1030 190px,
+        #17204a 190px, #17204a 260px
+      );
+    box-shadow: 0 -40px 80px -20px rgba(60,90,160,0.35) inset;
+  }
+
+  .skyline::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at  8% 30%, #ffd97a, transparent),
+      radial-gradient(1px 1px at 18% 55%, #ffd97a, transparent),
+      radial-gradient(1px 1px at 32% 20%, #ffd97a, transparent),
+      radial-gradient(1px 1px at 47% 60%, #ffd97a, transparent),
+      radial-gradient(1px 1px at 61% 35%, #ffd97a, transparent),
+      radial-gradient(1px 1px at 74% 50%, #ffd97a, transparent),
+      radial-gradient(1px 1px at 88% 25%, #ffd97a, transparent);
+    opacity: 0.7;
+  }
+
+  nav {
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: 34px; padding: 22px 48px;
+    font-size: 0.9rem; letter-spacing: 0.02em;
+  }
+  nav a { color: #eef1ff; text-decoration: none; opacity: 0.85; transition: opacity 0.15s; }
+  nav a:hover { opacity: 1; }
+  nav a.contact-btn {
+    border: 1px solid rgba(255,255,255,0.5);
+    padding: 7px 18px; border-radius: 20px;
+  }
+
+  .stage {
+    display: flex; justify-content: center; align-items: center;
+    padding: 40px 20px 120px;
+  }
+
+  .card {
+    position: relative; width: 100%; max-width: 340px;
+    background: rgba(20,26,55,0.55);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 18px; padding: 34px 30px 28px;
+    box-shadow: 0 25px 60px -15px rgba(0,0,0,0.6);
+  }
+
+  .close-x {
+    position: absolute; top: 16px; right: 18px;
+    font-size: 1rem; color: #d8dcf0; cursor: pointer; opacity: 0.8;
+  }
+  .close-x:hover { opacity: 1; }
+
+  h1 {
+    text-align: center; font-size: 1.6rem; font-weight: 700;
+    margin: 4px 0 26px; letter-spacing: 0.01em;
+  }
+
+  .field { margin-bottom: 16px; }
+
+  label {
+    display: block; font-size: 0.78rem;
+    color: #c7ccec; margin-bottom: 6px;
+  }
+
+  .input-wrap { position: relative; display: flex; align-items: center; }
+
+  input {
+    width: 100%;
+    padding: 11px 38px 11px 14px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 8px; color: #fff; font-size: 0.9rem;
+    outline: none; transition: border-color 0.15s, background 0.15s;
+  }
+  input::placeholder { color: rgba(255,255,255,0.4); }
+  input:focus { border-color: #8fa8ff; background: rgba(255,255,255,0.12); }
+  input.invalid { border-color: #ff8484; }
+
+  .toggle-pw {
+    position: absolute; right: 10px; background: none; border: none;
+    color: #b7bfe8; font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.03em; cursor: pointer; padding: 4px;
+  }
+  .toggle-pw:hover { color: #fff; }
+
+  .err-msg {
+    display: none; color: #ff9c9c; font-size: 0.72rem;
+    margin-top: 6px; line-height: 1.4;
+  }
+  .field.has-error .err-msg { display: block; }
+
+  button.submit {
+    width: 100%; padding: 12px;
+    background: #10142c;
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #fff; border-radius: 8px;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer;
+    transition: background 0.15s, transform 0.05s;
+  }
+  button.submit:hover { background: #1b2148; }
+  button.submit:active { transform: scale(0.99); }
+  button.submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .status {
+    display: none; margin-top: 14px; padding: 9px 11px;
+    border-radius: 7px; font-size: 0.78rem; text-align: center;
+  }
+  .status.show  { display: block; }
+  .status.success { background: rgba(70,200,120,0.18); color: #8ff0ae; border: 1px solid rgba(70,200,120,0.35); }
+  .status.error   { background: rgba(255,90,90,0.15);  color: #ff9c9c; border: 1px solid rgba(255,90,90,0.35); }
+
+  .foot {
+    text-align: center; margin-top: 18px;
+    font-size: 0.78rem; color: #c7ccec;
+  }
+  .foot a { color: #fff; text-decoration: none; font-weight: 600; }
+  .foot a:hover { text-decoration: underline; }
+
+  @media (max-width: 480px) {
+    nav { display: none; }
+    .stage { padding-top: 60px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="backdrop"></div>
+<div class="stars"></div>
+<div class="shooting-star"></div>
+<div class="shooting-star s2"></div>
+<div class="shooting-star s3"></div>
+<div class="skyline"></div>
+
+<nav>
+  <a href="#">Home</a>
+  <a href="#">About</a>
+  <a href="#">Services</a>
+  <a href="#">Contact</a>
+  <a href="/login" class="contact-btn">Login</a>
+</nav>
+
+<div class="stage">
+  <div class="card">
+    <span class="close-x">&times;</span>
+    <h1>Register</h1>
+
+    <form id="registerForm" novalidate>
+
+      <!-- Full Name -->
+      <div class="field" id="nameField">
+        <label for="fullName">Full Name</label>
+        <div class="input-wrap">
+          <input type="text" id="fullName" placeholder="Your full name" autocomplete="name">
+        </div>
+        <p class="err-msg" id="nameErr">Please enter your full name.</p>
+      </div>
+
+      <!-- Email -->
+      <div class="field" id="emailField">
+        <label for="email">Email</label>
+        <div class="input-wrap">
+          <input type="email" id="email" placeholder="yourname@gmail.com" autocomplete="username">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="position:absolute;right:12px;width:15px;height:15px;opacity:0.7;pointer-events:none"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 6l10 7 10-7"/></svg>
+        </div>
+        <p class="err-msg" id="emailErr">Email must end with @gmail.com</p>
+      </div>
+
+      <!-- Password -->
+      <div class="field" id="pwField">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <input type="password" id="password" placeholder="Min 8 chars, letters + numbers" autocomplete="new-password">
+          <button type="button" class="toggle-pw" id="togglePw">SHOW</button>
+        </div>
+        <p class="err-msg" id="pwErr">Min 8 characters, with letters and numbers.</p>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="field" id="pw2Field">
+        <label for="password2">Confirm Password</label>
+        <div class="input-wrap">
+          <input type="password" id="password2" placeholder="Repeat your password" autocomplete="new-password">
+          <button type="button" class="toggle-pw" id="togglePw2">SHOW</button>
+        </div>
+        <p class="err-msg" id="pw2Err">Passwords do not match.</p>
+      </div>
+
+      <button type="submit" class="submit" id="submitBtn">Create Account</button>
+      <div class="status" id="statusMsg"></div>
+    </form>
+
+    <p class="foot">Already have an account? <a href="/login">Login</a></p>
+  </div>
+</div>
+
+<script>
+  const form       = document.getElementById('registerForm');
+  const nameInput  = document.getElementById('fullName');
+  const emailInput = document.getElementById('email');
+  const pwInput    = document.getElementById('password');
+  const pw2Input   = document.getElementById('password2');
+  const submitBtn  = document.getElementById('submitBtn');
+  const statusMsg  = document.getElementById('statusMsg');
+
+  const emailRegex = /^[^\s@]+@gmail\.com$/i;
+  const pwRegex    = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{8,}$/;
+
+  // Password toggles
+  function makePwToggle(btn, input) {
+    btn.addEventListener('click', () => {
+      const hide = input.type === 'password';
+      input.type   = hide ? 'text' : 'password';
+      btn.textContent = hide ? 'HIDE' : 'SHOW';
+    });
+  }
+  makePwToggle(document.getElementById('togglePw'),  pwInput);
+  makePwToggle(document.getElementById('togglePw2'), pw2Input);
+
+  function setError(fieldId, inputEl, hasError) {
+    document.getElementById(fieldId).classList.toggle('has-error', hasError);
+    inputEl.classList.toggle('invalid', hasError);
+  }
+
+  // Live validation
+  nameInput.addEventListener('input',  () => setError('nameField',  nameInput,  nameInput.value.trim() === ''));
+  emailInput.addEventListener('input', () => { if (emailInput.value.length) setError('emailField', emailInput, !emailRegex.test(emailInput.value.trim())); });
+  pwInput.addEventListener('input',    () => { if (pwInput.value.length)    setError('pwField',    pwInput,    !pwRegex.test(pwInput.value)); });
+  pw2Input.addEventListener('input',   () => { if (pw2Input.value.length)   setError('pw2Field',   pw2Input,   pw2Input.value !== pwInput.value); });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    statusMsg.className = 'status';
+
+    const nameVal  = nameInput.value.trim();
+    const emailVal = emailInput.value.trim();
+    const pwVal    = pwInput.value;
+    const pw2Val   = pw2Input.value;
+
+    const nameOk  = nameVal  !== '';
+    const emailOk = emailRegex.test(emailVal);
+    const pwOk    = pwRegex.test(pwVal);
+    const pw2Ok   = pwVal === pw2Val;
+
+    setError('nameField',  nameInput,  !nameOk);
+    setError('emailField', emailInput, !emailOk);
+    setError('pwField',    pwInput,    !pwOk);
+    setError('pw2Field',   pw2Input,   !pw2Ok);
+
+    if (!nameOk || !emailOk || !pwOk || !pw2Ok) {
+      statusMsg.textContent = 'Please fix the errors above and try again.';
+      statusMsg.classList.add('show', 'error');
+      return;
+    }
+
+    submitBtn.disabled    = true;
+    submitBtn.textContent = 'Creating account…';
+
+    fetch('/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: emailVal, password: pwVal })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        statusMsg.textContent = 'Account created! Redirecting…';
+        statusMsg.classList.add('show', 'success');
+        setTimeout(() => { window.location.href = data.redirect; }, 900);
+      } else {
+        statusMsg.textContent = data.message || 'Registration failed. Please try again.';
+        statusMsg.classList.add('show', 'error');
+        submitBtn.disabled    = false;
+        submitBtn.textContent = 'Create Account';
+      }
+    })
+    .catch(() => {
+      statusMsg.textContent = 'Network error. Please check your connection.';
+      statusMsg.classList.add('show', 'error');
+      submitBtn.disabled    = false;
+      submitBtn.textContent = 'Create Account';
+    });
+  });
+</script>
+</body>
+</html>

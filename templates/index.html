@@ -27,9 +27,10 @@
 
    </div>
 
-    <div class="search-box">
-        <input type="text" placeholder="Search news...">
-    </div>
+    <form class="search-box" action="/index" method="GET" id="searchForm">
+        <input type="hidden" name="domain" value="{{ selected_domain }}">
+        <input type="text" name="q" placeholder="Search news..." value="{{ query | default('') }}" autocomplete="off">
+    </form>
 
     <div class="nav-icons">
 
@@ -44,12 +45,12 @@
 
     <div class="profile-dropdown">
 
-        <a href="#">
+        <a href="/profile">
             <i class="fa-solid fa-user"></i>
             My Profile
         </a>
 
-        <a href="#">
+        <a href="/profile">
             <i class="fa-solid fa-pen"></i>
             Edit Profile
         </a>
@@ -66,12 +67,12 @@
 
         <a href="#">
             <i class="fa-solid fa-circle-question"></i>
-            Help & Support
+            Help &amp; Support
         </a>
 
         <hr>
 
-        <a href="#" class="logout">
+        <a href="/logout" class="logout">
             <i class="fa-solid fa-right-from-bracket"></i>
             Logout
         </a>
@@ -125,105 +126,74 @@
     </h2>
 </div>
 
-<div class="card">
-
-<div class="card-header">
- 
-<img src="https://i.pravatar.cc/50?random=1" alt="Profile">
-
-<div>
-
-<h3>Job Alert</h3>
-
-<small>2 hours ago</small>
-
+<!-- ERROR / API QUOTA BANNER -->
+{% if error_msg %}
+<div class="card" style="border-left: 4px solid #e74c3c; background: #fff5f5;">
+    <h3 style="color:#e74c3c;"><i class="fa-solid fa-triangle-exclamation"></i> Search Notice</h3>
+    <p style="color:#555;">{{ error_msg }}</p>
 </div>
+{% endif %}
 
-</div>
+<!-- RESULTS LOOP -->
+{% if results %}
+    {% for result in results %}
+    <div class="card">
 
-<img src="https://picsum.photos/700/350?1">
+        <div class="card-header">
 
-<h2>Google Hiring Freshers 2026</h2>
+            <img src="https://www.google.com/s2/favicons?domain={{ result.source }}&sz=50"
+                 alt="{{ result.source }}"
+                 onerror="this.src='https://i.pravatar.cc/50?img={{ loop.index }}'">
 
-<p>
+            <div>
+                <h3>{{ result.source }}</h3>
+                <small>{{ selected_domain | replace('_', ' ') | title }}</small>
+            </div>
 
-Google announced new openings for software engineers.
+        </div>
 
-Students from all branches can apply.
+        {% if result.image %}
+        <img src="{{ result.image }}"
+             alt="{{ result.title }}"
+             style="max-height:250px;object-fit:cover;width:100%;"
+             onerror="this.style.display='none'">
+        {% endif %}
 
-</p>
+        <h2>
+            <a href="{{ result.link }}" target="_blank" rel="noopener noreferrer"
+               style="color:inherit;text-decoration:none;">
+                {{ result.title }}
+            </a>
+        </h2>
 
-<div class="buttons">
+        <p>{{ result.snippet }}</p>
 
-<button class="like">
+        <div class="buttons">
 
-<i class="fa-regular fa-heart"></i>
+            <button class="like">
+                <i class="fa-regular fa-heart"></i>
+                Like
+            </button>
 
-Like
+            <button class="save"
+                    data-title="{{ result.title | e }}"
+                    data-link="{{ result.link | e }}"
+                    data-snippet="{{ result.snippet | e }}"
+                    data-source="{{ result.source | e }}">
+                <i class="fa-regular fa-bookmark"></i>
+                Save
+            </button>
 
-</button>
+        </div>
 
-<button class="save">
-
-<i class="fa-regular fa-bookmark"></i>
-
-Save
-
-</button>
-
-</div>
-
-</div>
-
-<div class="card">
-
-<div class="card-header">
-    
-<img src="https://i.pravatar.cc/44">
-
-<div>
-
-<h3>Technology</h3>
-
-<small>5 hours ago</small>
-
-</div>
-
-</div>
-
-<img src="https://picsum.photos/700/350?2">
-
-<h2>New AI Tool Released</h2>
-
-<p>
-
-Artificial Intelligence is helping students prepare
-
-for placements and interviews.
-
-</p>
-
-<div class="buttons">
-
-<button class="like">
-
-<i class="fa-regular fa-heart"></i>
-
-Like
-
-</button>
-
-<button class="save">
-
-<i class="fa-regular fa-bookmark"></i>
-
-Save
-
-</button>
-
-</div>
-
-</div>
+    </div>
+    {% endfor %}
+{% elif not error_msg %}
+    <div class="card">
+        <h2>No results found</h2>
+        <p>Try a different search term or choose another domain.</p>
+    </div>
+{% endif %}
 
 </div>
 

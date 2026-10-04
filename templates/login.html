@@ -348,7 +348,7 @@
       <div class="status" id="statusMsg"></div>
     </form>
 
-    <p class="foot">Don't have an account? <a href="#">Register</a></p>
+    <p class="foot">Don't have an account? <a href="/register">Register</a></p>
   </div>
 </div>
 
@@ -408,16 +408,33 @@
       return;
     }
 
-    // Replace this block with a real fetch() call to your backend:
-    // fetch('/api/login', { method: 'POST', body: JSON.stringify({ email: emailVal, password: pwVal }) })
     submitBtn.disabled = true;
     submitBtn.textContent = 'Signing in...';
 
-   setTimeout(() => {
-
-  window.location.href = "/profile";
-
-}, 900);
+    fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: emailVal, password: pwVal })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        statusMsg.textContent = 'Login successful! Redirecting…';
+        statusMsg.classList.add('show', 'success');
+        setTimeout(() => { window.location.href = data.redirect; }, 700);
+      } else {
+        statusMsg.textContent = data.message || 'Login failed. Please try again.';
+        statusMsg.classList.add('show', 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Login';
+      }
+    })
+    .catch(() => {
+      statusMsg.textContent = 'Network error. Please check your connection.';
+      statusMsg.classList.add('show', 'error');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Login';
+    });
   });
 </script>
 

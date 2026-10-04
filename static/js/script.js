@@ -34,23 +34,43 @@ saveButtons.forEach(button => {
 
     button.addEventListener("click", function () {
 
-        if (button.innerHTML.includes("fa-regular")) {
+        const alreadySaved = button.innerHTML.includes("fa-solid");
 
-            button.innerHTML =
-                '<i class="fa-solid fa-bookmark"></i> Saved';
-
-            button.style.color = "#1877f2";
-
-            alert("News Saved Successfully!");
-
-        } else {
-
-            button.innerHTML =
-                '<i class="fa-regular fa-bookmark"></i> Save';
-
-            button.style.color = "white";   // ✅ changed
-
+        if (alreadySaved) {
+            // Unsave (visual only — no server endpoint for unsave yet)
+            button.innerHTML = '<i class="fa-regular fa-bookmark"></i> Save';
+            button.style.color = "white";
+            return;
         }
+
+        // Optimistic UI update immediately
+        button.innerHTML = '<i class="fa-solid fa-bookmark"></i> Saved';
+        button.style.color = "#1877f2";
+
+        // POST to backend
+        fetch('/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title:   button.dataset.title   || '',
+                link:    button.dataset.link    || '',
+                snippet: button.dataset.snippet || '',
+                source:  button.dataset.source  || ''
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.success) {
+                // Revert on failure
+                button.innerHTML = '<i class="fa-regular fa-bookmark"></i> Save';
+                button.style.color = "white";
+            }
+        })
+        .catch(() => {
+            // Revert on network error
+            button.innerHTML = '<i class="fa-regular fa-bookmark"></i> Save';
+            button.style.color = "white";
+        });
 
     });
 

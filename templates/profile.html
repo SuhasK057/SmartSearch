@@ -1345,19 +1345,19 @@ body {
 
 let profile = {
 
-    lastName: "",
-    firstName: "",
-    middleName: "",
+    lastName:   "{{ user.last_name   | default('') | e }}",
+    firstName:  "{{ user.first_name  | default('') | e }}",
+    middleName: "{{ user.middle_name | default('') | e }}",
 
-    email: "",
-    phone: "",
+    email:      "{{ user.email       | default('') | e }}",
+    phone:      "{{ user.phone       | default('') | e }}",
 
-    age: "",
-    gender: "",
+    age:        "{{ user.age         | default('') | e }}",
+    gender:     "{{ user.gender      | default('') | e }}",
 
-    education: "",
-    profession: "",
-    location: ""
+    education:  "{{ user.education   | default('') | e }}",
+    profession: "{{ user.profession  | default('') | e }}",
+    location:   "{{ user.location    | default('') | e }}"
 
 };
 
@@ -1571,46 +1571,48 @@ function saveProfile() {
     }
 
 
-    /* ================= UPDATE PROFILE ================= */
+    /* ================= SAVE TO SERVER ================= */
 
-    profile = {
+    const saveBtn = document.querySelector('.save-btn');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
 
-        lastName: lastName,
-
-        firstName: firstName,
-
-        middleName: middleName,
-
-        email: email,
-
-        phone: phone,
-
-        age: age,
-
-        gender: gender,
-
-        education: education,
-
-        profession: profession,
-
-        location: location
-
-    };
-
-
-    /* ================= UPDATE PAGE ================= */
-
-    loadProfile();
-
-
-    /* ================= CLOSE MODAL ================= */
-
-    closeEdit();
-
-
-    /* ================= SUCCESS MESSAGE ================= */
-
-    alert("Profile updated successfully!");
+    fetch('/profile/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            firstName, lastName, middleName,
+            email, phone, age, gender,
+            education, profession, location
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> Save Changes'; }
+        if (data.success) {
+            /* Update the local profile object with what the server confirmed */
+            profile = {
+                lastName:   data.user.lastName,
+                firstName:  data.user.firstName,
+                middleName: data.user.middleName,
+                email:      data.user.email,
+                phone:      data.user.phone,
+                age:        data.user.age,
+                gender:     data.user.gender,
+                education:  data.user.education,
+                profession: data.user.profession,
+                location:   data.user.location
+            };
+            loadProfile();
+            closeEdit();
+            alert("Profile updated successfully!");
+        } else {
+            alert("Error: " + (data.message || "Could not save profile."));
+        }
+    })
+    .catch(() => {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> Save Changes'; }
+        alert("Network error. Please check your connection and try again.");
+    });
 
 }
 
