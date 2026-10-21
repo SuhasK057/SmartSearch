@@ -1,7 +1,17 @@
-config.py
-config.py
-config.py
-smartsearch.db
-config.py
-config.py
+# Python cache & virtual environments
 __pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env
+
+# Local SQLite database (auto-created on run)
+smartsearch.db
+
+# Secrets & Local Config (use environment variables on Vercel)
+config.py
+
+# Vercel build output
+.vercel/

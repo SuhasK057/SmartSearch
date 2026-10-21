@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsSphere — {{ selected_domain | replace('_', ' ') | title }} Feed</title>
+
+    <!-- StyleSheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Font Awesome v6 (official CDN) -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          crossorigin="anonymous" referrerpolicy="no-referrer">
+
+    <script>
+        /* Anti-flash IIFE: apply stored theme BEFORE first paint */
+        (function(){ if(localStorage.getItem('theme')==='light') document.body.classList.add('light-theme'); })();
+    </script>
+</head>
+<body>
+
+<!-- ═══════════════════════════ NAVBAR ═══════════════════════════ -->
+<nav class="navbar">
+
+    <div class="logo">
+        <i class="fa-solid fa-globe"></i>
+        <span class="newssphere">
+            <span class="news">News</span><span class="sphere">Sphere</span>
+        </span>
+    </div>
+
+    <!-- Search form -->
+    <form class="search-box" action="/index" method="GET" id="searchForm"
+          style="display:flex;align-items:center;position:relative;">
+        <input type="hidden" name="domain" value="{{ selected_domain }}">
+        <input type="text" name="q"
+               placeholder="Search news…"
+               value="{{ query | default('') }}"
+               autocomplete="off"
+               style="width:100%;">
+        <button type="submit"
+                style="background:none;border:none;color:var(--text-primary);position:absolute;right:15px;cursor:pointer;">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+    </form>
+
+    <!-- Nav icons -->
+    <div class="nav-icons">
+
+        <!-- Theme toggle -->
+        <button id="theme-toggle"
+                style="background:none;border:none;color:inherit;font-size:19px;cursor:pointer;">
+            <i class="fa-solid fa-moon"></i>
+        </button>
+
+        <!-- Notification bell -->
+        <i class="fa-solid fa-bell"></i>
+
+        <!-- Saved bookmark -->
+        <a href="/saved" style="color:inherit;text-decoration:none;">
+            <i class="fa-solid fa-bookmark"></i>
+        </a>
+
+    </div>
+
+    <!-- Profile dropdown -->
+    <div class="profile-menu">
+        <i class="fa-solid fa-user profile-icon"></i>
+        <div class="profile-dropdown">
+            <a href="/profile">
+                <i class="fa-solid fa-user"></i>
+                My Profile
+            </a>
+            <hr>
+            <a href="/logout" class="logout">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+            </a>
+        </div>
+    </div>
+
+</nav>
+
+<!-- ═══════════════════════════ MAIN ═══════════════════════════ -->
+<div class="container">
+
+<!-- ─── LEFT SIDEBAR ─── -->
+<div class="left-sidebar">
+    <ul>
+        <li><a href="/domain"                              style="color:inherit;text-decoration:none;display:block;width:100%;"><i class="fa-solid fa-house"></i> Home</a></li>
+        <li><a href="/index?domain=job_seeker"             style="color:inherit;text-decoration:none;display:block;width:100%;"><i class="fa-solid fa-briefcase"></i> Jobs</a></li>
+        <li><a href="/index?domain=engineer"               style="color:inherit;text-decoration:none;display:block;width:100%;"><i class="fa-solid fa-microchip"></i> Technology</a></li>
+        <li><a href="/index?domain=student"                style="color:inherit;text-decoration:none;display:block;width:100%;"><i class="fa-solid fa-graduation-cap"></i> Education</a></li>
+        <li><a href="/index?domain=researcher"             style="color:inherit;text-decoration:none;display:block;width:100%;"><i class="fa-solid fa-heart"></i> Health</a></li>
+        <li><a href="/index?domain=investor"               style="color:inherit;text-decoration:none;display:block;width:100%;"><i class="fa-solid fa-chart-line"></i> Economy &amp; Stock</a></li>
+        <li><a href="/index?domain=politician"             style="color:inherit;text-decoration:none;display:block;width:100%;"><i class="fa-solid fa-landmark"></i> Politics</a></li>
+        <li><a href="/index?domain=general_reader"         style="color:inherit;text-decoration:none;display:block;width:100%;"><i class="fa-solid fa-film"></i> Entertainment</a></li>
+        <li><a href="/index?domain=sports_fan"             style="color:inherit;text-decoration:none;display:block;width:100%;"><i class="fa-solid fa-futbol"></i> Sports</a></li>
+    </ul>
+</div>
+
+<!-- ─── NEWS FEED ─── -->
+<div class="feed">
+
+    <div class="selected-domain">
+        <h2>{{ selected_domain | replace('_', ' ') | title }} News</h2>
+    </div>
+
+    <!-- ERROR / API QUOTA BANNER (only shown when error_msg is set AND no mock fallback) -->
+    {% if error_msg %}
+    <div class="card" style="border-left:4px solid #e74c3c;">
+        <div style="padding:20px;">
+            <h3 style="color:#e74c3c; margin-bottom:8px;">
+                <i class="fa-solid fa-triangle-exclamation"></i> Search Notice
+            </h3>
+            <p style="padding:0; color:var(--text-secondary);">{{ error_msg }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ─── RESULTS LOOP ─── -->
+    {% if results %}
+        {% for result in results %}
+        <div class="card {% if result.company_class %}{{ result.company_class }}{% endif %}">
+
+            <!-- Card header: favicon + source + category -->
+            <div class="card-header">
+
+                {% set icon_class = 'fa-solid fa-briefcase' if selected_domain == 'job_seeker' else 'fa-solid fa-newspaper' %}
+                <img src="https://www.google.com/s2/favicons?domain={{ result.source }}&sz=50"
+                     alt="{{ result.source }}"
+                     onerror="this.onerror=null; this.outerHTML=`<div style='width:45px;height:45px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#1c2147;border:2px solid #765cff;color:#765cff;font-size:20px;'><i class='{{ icon_class }}'></i></div>`">
+
+                <div>
+                    <h3>{{ result.source }}</h3>
+                    <small>{{ selected_domain | replace('_', ' ') | title }}</small>
+                </div>
+
+            </div>
+
+            <!-- Article image (optional) -->
+            {% if result.image %}
+            <img src="{{ result.image }}"
+                 alt="{{ result.title }}"
+                 style="max-height:260px;object-fit:cover;width:100%;"
+                 onerror="this.style.display='none'">
+            {% endif %}
+
+            <!-- Title -->
+            <h2>
+                <a href="{{ result.link }}" target="_blank" rel="noopener noreferrer"
+                   style="color:inherit;text-decoration:none;">
+                    {{ result.title }}
+                </a>
+            </h2>
+
+            <!-- Snippet -->
+            <p>{{ result.snippet }}</p>
+
+            <!-- Read More / Expand -->
+            <button class="read-more-btn">Read More <i class="fa-solid fa-chevron-down" style="font-size:12px;margin-left:4px;"></i></button>
+            <div class="extra-content" style="display:none; background: rgba(115,87,255,0.05); border-radius: 12px; padding: 16px; margin: 0 20px 20px; border: 1px solid rgba(115,87,255,0.1);">
+                {% if result.long_desc %}
+                <p style="padding:0; margin-bottom:12px; line-height:1.65; color:var(--text-secondary);">{{ result.long_desc }}</p>
+                {% else %}
+                <p style="padding:0; margin-bottom:12px; line-height:1.65; color:var(--text-secondary);">
+                    Explore the full story on the official <strong>{{ result.source }}</strong> website to get complete insights, related media, and in-depth analysis.
+                </p>
+                {% endif %}
+
+                {% if result.is_job and result.requirements %}
+                <p style="padding:0; margin-bottom:6px; font-weight:600; color:var(--text-primary); font-size:13px;">
+                    <i class="fa-solid fa-list-check" style="color:var(--accent); margin-right:6px;"></i>Requirements
+                </p>
+                <ul style="margin-left:20px; margin-bottom:14px; color:var(--text-secondary); font-size:14px;">
+                    {% for req in result.requirements %}
+                    <li style="margin-bottom:4px;">{{ req }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+                <a href="{{ result.link }}" target="_blank" rel="noopener noreferrer"
+                   style="display:inline-flex; align-items:center; gap:8px; padding:10px 20px; background:var(--accent); color:#fff; border-radius:20px; font-weight:600; text-decoration:none; font-size:14px; box-shadow:0 4px 12px rgba(115,87,255,0.3);">
+                    {% if result.is_job %}
+                    Apply on {{ result.source }} <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    {% else %}
+                    Read Full Article <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    {% endif %}
+                </a>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="buttons">
+
+                <button class="like"
+                        data-link="{{ result.link | e }}"
+                        data-liked="{{ 'true' if result.is_liked else 'false' }}"
+                        data-count="{{ result.like_count | default(0) }}"
+                        {% if result.is_liked %}style="color:#ff5c8a;"{% endif %}>
+                    {% if result.is_liked %}
+                        <i class="fa-solid fa-heart"></i> Liked{% if result.like_count and result.like_count > 1 %} <span class="action-count">{{ result.like_count }}</span>{% endif %}
+                    {% else %}
+                        <i class="fa-regular fa-heart"></i> Like{% if result.like_count and result.like_count > 1 %} <span class="action-count">{{ result.like_count }}</span>{% endif %}
+                    {% endif %}
+                </button>
+
+                <button class="save"
+                        data-title="{{ result.title | e }}"
+                        data-link="{{ result.link | e }}"
+                        data-snippet="{{ result.snippet | e }}"
+                        data-source="{{ result.source | e }}"
+                        data-saved="{{ 'true' if result.is_saved else 'false' }}"
+                        data-count="{{ result.save_count | default(0) }}"
+                        {% if result.is_saved %}style="color:#1877f2;"{% endif %}>
+                    {% if result.is_saved %}
+                        <i class="fa-solid fa-bookmark"></i> Saved{% if result.save_count and result.save_count > 1 %} <span class="action-count">{{ result.save_count }}</span>{% endif %}
+                    {% else %}
+                        <i class="fa-regular fa-bookmark"></i> Save{% if result.save_count and result.save_count > 1 %} <span class="action-count">{{ result.save_count }}</span>{% endif %}
+                    {% endif %}
+                </button>
+
+            </div>
+
+        </div>
+        {% endfor %}
+
+    {% elif not error_msg %}
+        <div class="card" style="padding:30px;text-align:center;">
+            <i class="fa-solid fa-folder-open" style="font-size:40px;color:var(--text-tertiary);margin-bottom:14px;display:block;"></i>
+            <h2 style="padding:0;margin-bottom:8px;">No results found</h2>
+            <p style="padding:0;">Try a different search term or choose another domain.</p>
+        </div>
+    {% endif %}
+
+</div><!-- /feed -->
+
+<!-- ─── RIGHT SIDEBAR ─── -->
+<div class="right-sidebar">
+
+    <h2>Trending</h2>
+    <p>#Jobs</p>
+    <p>#AI</p>
+    <p>#ISRO</p>
+    <p>#Google</p>
+    <p>#Scholarship</p>
+
+    <hr>
+
+    <h2>Recommended</h2>
+    <p onclick="window.location.href='/index?domain=general_reader'">Latest News</p>
+    <p onclick="window.location.href='/index?domain=engineer'">Top Tech Stories</p>
+    <p onclick="window.location.href='/index?domain=investor'">Market Updates</p>
+    <p onclick="window.location.href='/index?domain=researcher'">Research Highlights</p>
+
+    <hr>
+
+    <!-- Demo mode shortcut for presentation -->
+    <h2 style="font-size:14px; margin-bottom:12px;">Demo Mode</h2>
+    <a href="/index?domain={{ selected_domain }}&demo=true"
+       style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:rgba(115,87,255,0.12);color:var(--accent);text-decoration:none;font-size:13px;font-weight:600;border:1px solid var(--accent);">
+        <i class="fa-solid fa-rocket"></i> Load Demo Data
+    </a>
+
+</div><!-- /right-sidebar -->
+
+</div><!-- /container -->
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

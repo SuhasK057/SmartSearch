@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsSphere - Choose Your Domain</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        /* Anti-flash IIFE */
+        (function(){ if(localStorage.getItem('theme')==='light') document.body.classList.add('light-theme'); })();
+    </script>
+</head>
+<body>
+
+    <!-- =========================
+         NAVBAR
+    ========================= -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-globe"></i>
+            <span class="newssphere">
+                <span class="news">News</span><span class="sphere">Sphere</span>
+            </span>
+        </div>
+
+        <div class="nav-icons" style="margin-left:auto;">
+            <button id="theme-toggle" style="background:none;border:none;color:inherit;font-size:19px;cursor:pointer;">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+            <a href="/saved" style="color:inherit;text-decoration:none;">
+                <i class="fa-solid fa-bookmark"></i>
+            </a>
+        </div>
+
+        <div class="profile-menu">
+            <i class="fa-solid fa-user profile-icon"></i>
+            <div class="profile-dropdown">
+                <a href="/profile"><i class="fa-solid fa-user"></i> My Profile</a>
+                <hr>
+                <a href="/logout" class="logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+            </div>
+        </div>
+    </nav>
+
+
+
+    <!-- =========================
+         MAIN CONTENT
+    ========================= -->
+
+    <main class="domain-container">
+
+
+        <!-- =========================
+             HEADING
+        ========================= -->
+
+        <section class="heading-area">
+
+            <h1>
+                Choose Your <span>Domain</span>
+            </h1>
+
+
+            <p>
+                Select your profile to get news that matters to you
+            </p>
+
+
+            <div class="heading-line"></div>
+
+        </section>
+
+
+
+        <!-- =========================
+             DOMAIN CARDS
+        ========================= -->
+
+        <div class="domain-grid">
+
+
+            <!-- =====================
+                 STUDENT
+            ====================== -->
+
+            <div class="domain-card student" onclick="window.location.href=this.querySelector('a').href" style="cursor: pointer;">
+
+                <div class="icon-circle">
+
+                    <i class="fa-solid fa-graduation-cap"></i>
+
+                </div>
+
+
+                <h3>
+                    Student
+                </h3>
+
+
+                <p>
+                    Education, exams, scholarships and student opportunities
+                </p>
+
+
+                <a href="{{ url_for('index', domain='student') }}" class="arrow-btn">
+                 <i class="fa-solid fa-arrow-right"></i>
+                </a>
+
+            </div>
+
+
+
+            <!-- =====================
+                 JOB SEEKER
+            ====================== -->
+
+            <div class="domain-card job" onclick="window.location.href=this.querySelector('a').href" style="cursor: pointer;">
+
+                <div class="icon-circle">
+
+                    <i class="fa-solid fa-briefcase"></i>
+
+                </div>
+
+
+                <h3>
+                    Job Seeker
+                </h3>
+
+
+                <p>
+                    Jobs, hiring updates and career opportunities
+                </p>
+
+              <a href="{{ url_for('index', domain='job_seeker') }}" class="arrow-btn">
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+
+
+
+            <!-- =====================
+                 GENERAL READER
+            ====================== -->
+
+            <div class="domain-card reader" onclick="window.location.href=this.querySelector('a').href" style="cursor: pointer;">
+
+                <div class="icon-circle">
+
+                    <i class="fa-solid fa-newspaper"></i>
+
+                </div>
+
+
+                <h3>
+                    General Reader
+                </h3>
+
+
+                <p>
+                    Latest national and international news
+                </p>
+
+              <a href="{{ url_for('index', domain='general_reader') }}" class="arrow-btn">
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            
+
+            </div>
+
+
+
+            <!-- =====================
+                 INVESTOR
+            ====================== -->
+
+            <div class="domain-card investor" onclick="window.location.href=this.querySelector('a').href" style="cursor: pointer;">
+
+                <div class="icon-circle">
+
+                    <i class="fa-solid fa-chart-line"></i>
+
+                </div>
+
+
+                <h3>
+                    Investor
+                </h3>
+
+
+                <p>
+                    Stock market, finance and economic updates
+                </p>
+
+             <a href="{{ url_for('index', domain='investor') }}" class="arrow-btn">
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            
+
+            </div>
+
+
+
+            <!-- =====================
+                 ENGINEER
+            ====================== -->
+
+            <div class="domain-card engineer" onclick="window.location.href=this.querySelector('a').href" style="cursor: pointer;">
+
+                <div class="icon-circle">
+
+                    <i class="fa-solid fa-gears"></i>
+
+                </div>
+
+
+                <h3>
+                    Engineer
+                </h3>
+
+
+                <p>
+                    Engineering, technology and innovation news
+                </p>
+
+            <a href="{{ url_for('index', domain='engineer') }}" class="arrow-btn">
+              <i class="fa-solid fa-arrow-right"></i>
+            </a>
+            </div>
+
+
+
+            <!-- =====================
+                 FREELANCER
+            ====================== -->
+
+            <div class="domain-card freelancer" onclick="window.location.href=this.querySelector('a').href" style="cursor: pointer;">
+
+                <div class="icon-circle">
+
+                    <i class="fa-solid fa-laptop-code"></i>
+
+                </div>
+
+
+                <h3>
+                    Freelancer
+                </h3>
+
+
+                <p>
+                    Freelancing, remote work and digital opportunities
+                </p>
+
+            <a href="{{ url_for('index', domain='freelancer') }}" class="arrow-btn">
+              <i class="fa-solid fa-arrow-right"></i>
+            </a>
+            
+
+            </div>
+
+
+
+            <!-- =====================
+                 ESPORTS FAN
+            ====================== -->
+
+            <div class="domain-card esports" onclick="window.location.href=this.querySelector('a').href" style="cursor: pointer;">
+
+                <div class="icon-circle">
+
+                    <i class="fa-solid fa-gamepad"></i>
+
+                </div>
+
+
+                <h3>
+                    eSports Fan
+                </h3>
+
+
+                <p>
+                    Gaming tournaments, teams and eSports news
+                </p>
+
+            <a href="{{ url_for('index', domain='esports_fan') }}" class="arrow-btn">
+              <i class="fa-solid fa-arrow-right"></i>
+            </a>
+
+            </div>
+
+
+
+            <!-- =====================
+                 INTERNSHIP SEEKER
+            ====================== -->
+
+            <div class="domain-card internship" onclick="window.location.href=this.querySelector('a').href" style="cursor: pointer;">
+
+                <div class="icon-circle">
+
+                    <i class="fa-solid fa-user-tie"></i>
+
+                </div>
+
+
+                <h3>
+                    Internship Seeker
+                </h3>
+
+
+                <p>
+                    Internship opportunities and career updates
+                </p>
+
+            <a href="{{ url_for('index', domain='internship_seeker') }}" class="arrow-btn">
+              <i class="fa-solid fa-arrow-right"></i>
+            </a>
+
+    </div>
+
+            <!-- =====================
+                 FARMER
+            ====================== -->
+            <div class="domain-card reader" onclick="window.location.href=this.querySelector('a').href" style="cursor: pointer;">
+                <div class="icon-circle">
+                    <i class="fa-solid fa-tractor"></i>
+                </div>
+                <h3>Farmer</h3>
+                <p>Latest farming, agriculture, and crop news</p>
+                <a href="{{ url_for('index', domain='farmer') }}" class="arrow-btn">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- =====================
+                 SPORTS FAN
+            ====================== -->
+            <div class="domain-card investor" onclick="window.location.href=this.querySelector('a').href" style="cursor: pointer;">
+                <div class="icon-circle">
+                    <i class="fa-solid fa-basketball"></i>
+                </div>
+                <h3>Sports Fan</h3>
+                <p>Sports updates, scores, and news</p>
+                <a href="{{ url_for('index', domain='sports_fan') }}" class="arrow-btn">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- =====================
+                 POLITICIAN
+            ====================== -->
+            <div class="domain-card job" onclick="window.location.href=this.querySelector('a').href" style="cursor: pointer;">
+                <div class="icon-circle">
+                    <i class="fa-solid fa-landmark"></i>
+                </div>
+                <h3>Politician</h3>
+                <p>Political news, government updates, and policies</p>
+                <a href="{{ url_for('index', domain='politician') }}" class="arrow-btn">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- =====================
+                 RESEARCHER
+            ====================== -->
+            <div class="domain-card engineer" onclick="window.location.href=this.querySelector('a').href" style="cursor: pointer;">
+                <div class="icon-circle">
+                    <i class="fa-solid fa-microscope"></i>
+                </div>
+                <h3>Researcher</h3>
+                <p>Latest research papers, studies, and discoveries</p>
+                <a href="{{ url_for('index', domain='researcher') }}" class="arrow-btn">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+
+        </div>
+
+    </main>
+
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

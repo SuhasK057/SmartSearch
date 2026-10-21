@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile — NewsSphere</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* Page layout */
+        .profile-page   { min-height: 100vh; display: flex; flex-direction: column; }
+        .profile-center { flex: 1; display: flex; align-items: center; justify-content: center; padding: 50px 20px; }
+
+        /* Onboarding card — gets the slideUpFade animation defined in style.css */
+        .profile-card {
+            width: 100%;
+            max-width: 520px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 22px;
+            padding: 44px 40px;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+        }
+
+        /* Full profile card is wider */
+        .profile-card.full { max-width: 740px; }
+
+        .card-icon {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .card-icon i {
+            font-size: 42px;
+            color: var(--accent);
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        .card-sub {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        /* Form rows */
+        .form-row { display: flex; gap: 14px; flex-wrap: wrap; }
+        .form-col  { flex: 1; min-width: 160px; display: flex; flex-direction: column; gap: 5px; }
+        .form-full { display: flex; flex-direction: column; gap: 5px; }
+
+        /* Profile input reuses .auth-input via class */
+
+        /* Message area */
+        .profile-msg {
+            font-size: 13px;
+            text-align: center;
+            min-height: 18px;
+            margin-bottom: 6px;
+        }
+
+        /* Section separator */
+        .section-sep {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 24px 0;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin-bottom: 14px;
+        }
+    </style>
+    <script>
+        /* Anti-flash */
+        (function(){ if(localStorage.getItem('theme')==='light') document.body.classList.add('light-theme'); })();
+    </script>
+</head>
+<body class="profile-page">
+
+<!-- ═══ NAVBAR ═══ -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fa-solid fa-globe"></i>
+        <span class="newssphere">
+            <span class="news">News</span><span class="sphere">Sphere</span>
+        </span>
+    </div>
+    <div class="nav-icons" style="margin-left:auto;">
+        <button id="theme-toggle" style="background:none;border:none;color:inherit;font-size:19px;cursor:pointer;margin-right:20px;">
+            <i class="fa-solid fa-moon"></i>
+        </button>
+        {% if user and user.is_profile_complete %}
+        <a href="/domain" style="color:inherit;text-decoration:none;margin-right:20px;">
+            <i class="fa-solid fa-house"></i>
+        </a>
+        {% endif %}
+        <a href="/logout" style="color:inherit;text-decoration:none;margin-right:10px;">
+            <i class="fa-solid fa-right-from-bracket"></i>
+        </a>
+    </div>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<div class="profile-center">
+
+    {% if user and not user.is_profile_complete %}
+    <!-- ══════════════════════════════════════
+         ONBOARDING CARD (new / incomplete users)
+         This card floats in with slideUpFade.
+    ══════════════════════════════════════ -->
+    <div class="profile-card onboarding-card">
+
+        <div class="card-icon"><i class="fa-solid fa-rocket"></i></div>
+        <h1 class="card-title">Almost there! 🚀</h1>
+        <p class="card-sub">
+            Tell us a bit about yourself so we can personalise your news feed.
+        </p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-banner {{ category }}">
+                    <i class="fa-solid fa-circle-info"></i>&nbsp; {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST" action="/profile" id="onboardingForm">
+            <div style="display:flex; flex-direction:column; gap:14px;">
+
+                <div class="form-full">
+                    <label class="auth-label">
+                        <i class="fa-solid fa-briefcase" style="margin-right:6px; color:var(--accent);"></i>
+                        Occupation / Role
+                    </label>
+                    <input type="text" name="occupation" class="auth-input"
+                           placeholder="e.g. Student, Software Engineer, Investor…"
+                           value="{{ user.occupation or '' }}" required>
+                </div>
+
+                <div class="form-full">
+                    <label class="auth-label">
+                        <i class="fa-solid fa-cake-candles" style="margin-right:6px; color:var(--accent);"></i>
+                        Age
+                    </label>
+                    <input type="number" name="age" class="auth-input"
+                           placeholder="Your age" min="1" max="120"
+                           value="{{ user.age or '' }}" required>
+                </div>
+
+                <button type="submit" class="auth-btn" id="onboardBtn" style="margin-top:10px;">
+                    <i class="fa-solid fa-arrow-right"></i> Unlock My Feed
+                </button>
+
+            </div>
+        </form>
+
+    </div>
+
+    {% else %}
+    <!-- ══════════════════════════════════════
+         FULL PROFILE EDIT CARD (complete users)
+    ══════════════════════════════════════ -->
+    <div class="profile-card full onboarding-card">
+        <div class="card-icon"><i class="fa-solid fa-circle-user"></i></div>
+        <h1 class="card-title">My Profile</h1>
+        <p class="card-sub">Update your details — they help personalise your feed.</p>
+
+        <div class="profile-msg" id="profileMessage"></div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-banner {{ category }}">
+                    <i class="fa-solid fa-circle-info"></i>&nbsp; {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <form id="profileForm" novalidate>
+
+            <p class="section-title"><i class="fa-solid fa-user"></i>&nbsp; Personal Info</p>
+
+            <div class="form-row" style="margin-bottom:14px;">
+                <div class="form-col">
+                    <label class="auth-label">First Name</label>
+                    <input type="text" id="firstName" class="auth-input" value="{{ user.first_name or '' }}">
+                </div>
+                <div class="form-col">
+                    <label class="auth-label">Middle Name</label>
+                    <input type="text" id="middleName" class="auth-input" value="{{ user.middle_name or '' }}">
+                </div>
+                <div class="form-col">
+                    <label class="auth-label">Last Name</label>
+                    <input type="text" id="lastName" class="auth-input" value="{{ user.last_name or '' }}">
+                </div>
+            </div>
+
+            <div class="form-row" style="margin-bottom:14px;">
+                <div class="form-col">
+                    <label class="auth-label">Age</label>
+                    <input type="number" id="age" class="auth-input" min="1" max="120" value="{{ user.age or '' }}">
+                </div>
+                <div class="form-col">
+                    <label class="auth-label">Gender</label>
+                    <input type="text" id="gender" class="auth-input" value="{{ user.gender or '' }}">
+                </div>
+            </div>
+
+            <hr class="section-sep">
+            <p class="section-title"><i class="fa-solid fa-envelope"></i>&nbsp; Contact</p>
+
+            <div class="form-row" style="margin-bottom:14px;">
+                <div class="form-col">
+                    <label class="auth-label">Email *</label>
+                    <input type="email" id="email" class="auth-input" value="{{ user.email or '' }}" required>
+                </div>
+                <div class="form-col">
+                    <label class="auth-label">Phone *</label>
+                    <input type="text" id="phone" class="auth-input" value="{{ user.phone or '' }}" required>
+                </div>
+            </div>
+
+            <hr class="section-sep">
+            <p class="section-title"><i class="fa-solid fa-graduation-cap"></i>&nbsp; Background</p>
+
+            <div class="form-row" style="margin-bottom:14px;">
+                <div class="form-col">
+                    <label class="auth-label">Occupation</label>
+                    <input type="text" id="occupation" class="auth-input" value="{{ user.occupation or '' }}">
+                </div>
+                <div class="form-col">
+                    <label class="auth-label">Profession</label>
+                    <input type="text" id="profession" class="auth-input" value="{{ user.profession or '' }}">
+                </div>
+            </div>
+
+            <div class="form-row" style="margin-bottom:14px;">
+                <div class="form-col">
+                    <label class="auth-label">Education</label>
+                    <input type="text" id="education" class="auth-input" value="{{ user.education or '' }}">
+                </div>
+                <div class="form-col">
+                    <label class="auth-label">Location</label>
+                    <input type="text" id="location" class="auth-input" value="{{ user.location or '' }}">
+                </div>
+            </div>
+
+            <button type="submit" class="auth-btn" id="saveProfileBtn" style="margin-top:8px;">
+                <i class="fa-solid fa-floppy-disk"></i> Save Profile
+            </button>
+
+        </form>
+
+    </div>
+    {% endif %}
+
+</div><!-- /profile-center -->
+
+<script>
+/* Lightweight theme toggle */
+(function(){
+    var btn  = document.getElementById('theme-toggle');
+    var icon = btn ? btn.querySelector('i') : null;
+    function syncIcon(){
+        if(!icon) return;
+        if(document.body.classList.contains('light-theme')){
+            icon.classList.replace('fa-moon','fa-sun');
+        } else {
+            icon.classList.replace('fa-sun','fa-moon');
+        }
+    }
+    syncIcon();
+    if(btn){ btn.addEventListener('click', function(){
+        document.body.classList.toggle('light-theme');
+        localStorage.setItem('theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
+        syncIcon();
+    }); }
+})();
+
+/* Onboarding form — simple spinner while submitting */
+(function(){
+    var form = document.getElementById('onboardingForm');
+    if(!form) return;
+    form.addEventListener('submit', function(){
+        var btn = document.getElementById('onboardBtn');
+        if(btn){
+            btn.innerHTML = '<div class="loading-spinner"></div>';
+            btn.disabled  = true;
+        }
+    });
+})();
+
+/* Full profile AJAX update */
+(function(){
+    var form = document.getElementById('profileForm');
+    if(!form) return;
+
+    form.addEventListener('submit', async function(e){
+        e.preventDefault();
+        var msgDiv  = document.getElementById('profileMessage');
+        var saveBtn = document.getElementById('saveProfileBtn');
+
+        msgDiv.textContent  = 'Saving…';
+        msgDiv.style.color  = 'var(--text-secondary)';
+        saveBtn.innerHTML   = '<div class="loading-spinner"></div>';
+        saveBtn.disabled    = true;
+
+        var data = {
+            firstName:  document.getElementById('firstName')  ? document.getElementById('firstName').value  : '',
+            middleName: document.getElementById('middleName') ? document.getElementById('middleName').value : '',
+            lastName:   document.getElementById('lastName')   ? document.getElementById('lastName').value   : '',
+            email:      document.getElementById('email')      ? document.getElementById('email').value      : '',
+            phone:      document.getElementById('phone')      ? document.getElementById('phone').value      : '',
+            age:        document.getElementById('age')        ? document.getElementById('age').value        : '',
+            gender:     document.getElementById('gender')     ? document.getElementById('gender').value     : '',
+            education:  document.getElementById('education')  ? document.getElementById('education').value  : '',
+            profession: document.getElementById('profession') ? document.getElementById('profession').value : '',
+            occupation: document.getElementById('occupation') ? document.getElementById('occupation').value : '',
+            location:   document.getElementById('location')   ? document.getElementById('location').value   : '',
+        };
+
+        try {
+            var res    = await fetch('/profile/update', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify(data)
+            });
+            var result = await res.json();
+
+            if(result.success){
+                msgDiv.textContent = '✓ Profile saved successfully!';
+                msgDiv.style.color = '#2ecc71';
+            } else {
+                msgDiv.textContent = result.message;
+                msgDiv.style.color = '#e74c3c';
+            }
+        } catch(err){
+            msgDiv.textContent = 'Network error. Please try again.';
+            msgDiv.style.color = '#e74c3c';
+        }
+
+        saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Profile';
+        saveBtn.disabled  = false;
+    });
+})();
+</script>
+</body>
+</html>

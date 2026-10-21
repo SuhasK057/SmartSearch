@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register — NewsSphere</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { background: var(--bg-main); }
+
+        .auth-page   { min-height: 100vh; display: flex; flex-direction: column; }
+        .auth-center { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+
+        .auth-card {
+            width: 100%;
+            max-width: 460px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 22px;
+            padding: 40px 36px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            animation: slideUpFade 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .auth-title    { font-size: 26px; font-weight: bold; color: var(--text-primary); text-align: center; margin-bottom: 6px; }
+        .auth-subtitle { font-size: 13px; color: var(--text-tertiary); text-align: center; margin-bottom: 28px; }
+        .auth-form     { display: flex; flex-direction: column; gap: 14px; }
+
+        .input-group              { position: relative; }
+        .input-group .input-icon  { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); font-size: 14px; pointer-events: none; }
+        .input-group .auth-input  { padding-left: 40px; }
+
+        .error-msg   { color: #e74c3c; font-size: 13px; text-align: center; min-height: 18px; margin-bottom: 4px; }
+
+        .password-hint {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-left: 14px;
+            margin-top: -8px;
+        }
+
+        .auth-link-row   { text-align: center; margin-top: 20px; color: var(--text-secondary); font-size: 14px; }
+        .auth-link-row a { color: var(--accent); text-decoration: none; font-weight: 600; }
+        .auth-link-row a:hover { text-decoration: underline; }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(22px); }
+            to   { opacity: 1; transform: translateY(0);    }
+        }
+    </style>
+    <script>
+        (function(){ if(localStorage.getItem('theme')==='light') document.body.classList.add('light-theme'); })();
+    </script>
+</head>
+<body class="auth-page">
+
+<!-- ═══ NAVBAR ═══ -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fa-solid fa-globe"></i>
+        <span class="newssphere">
+            <span class="news">News</span><span class="sphere">Sphere</span>
+        </span>
+    </div>
+    <div class="nav-icons" style="margin-left:auto;">
+        <button id="theme-toggle" style="background:none;border:none;color:inherit;font-size:19px;cursor:pointer;">
+            <i class="fa-solid fa-moon"></i>
+        </button>
+    </div>
+</nav>
+
+<!-- ═══ FORM ═══ -->
+<div class="auth-center">
+    <div class="auth-card">
+
+        <div style="text-align:center; margin-bottom:20px;">
+            <i class="fa-solid fa-user-plus" style="font-size:36px; color:var(--accent);"></i>
+        </div>
+
+        <h1 class="auth-title">Create Account</h1>
+        <p class="auth-subtitle">Join NewsSphere — your personalised news feed</p>
+
+        <div class="error-msg" id="registerError"></div>
+
+        <form class="auth-form" id="registerForm" novalidate>
+
+            <div class="input-group">
+                <i class="fa-solid fa-envelope input-icon"></i>
+                <input type="email" id="email" class="auth-input"
+                       placeholder="Email address (max 50 chars)" required autocomplete="email" maxlength="50">
+            </div>
+
+            <div class="input-group">
+                <i class="fa-solid fa-lock input-icon"></i>
+                <input type="password" id="password" class="auth-input"
+                       placeholder="Password" required autocomplete="new-password">
+            </div>
+            <p class="password-hint">
+                <i class="fa-solid fa-circle-info"></i>&nbsp;
+                Min 8 characters — must contain letters &amp; numbers
+            </p>
+
+            <div class="input-group">
+                <i class="fa-solid fa-lock input-icon"></i>
+                <input type="password" id="confirm_password" class="auth-input"
+                       placeholder="Confirm password" required autocomplete="new-password">
+            </div>
+
+            <button type="submit" class="auth-btn" id="registerBtn">
+                <i class="fa-solid fa-user-plus"></i> Create Account
+            </button>
+
+        </form>
+
+        <p class="auth-link-row">
+            Already have an account? <a href="/login">Sign in</a>
+        </p>
+
+    </div>
+</div>
+
+<script>
+/* Lightweight theme toggle */
+(function(){
+    var btn  = document.getElementById('theme-toggle');
+    var icon = btn ? btn.querySelector('i') : null;
+    function syncIcon(){
+        if(!icon) return;
+        if(document.body.classList.contains('light-theme')){
+            icon.classList.replace('fa-moon','fa-sun');
+        } else {
+            icon.classList.replace('fa-sun','fa-moon');
+        }
+    }
+    syncIcon();
+    if(btn){ btn.addEventListener('click', function(){
+        document.body.classList.toggle('light-theme');
+        localStorage.setItem('theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
+        syncIcon();
+    }); }
+})();
+
+/* Register form submission */
+document.getElementById('registerForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    var errDiv      = document.getElementById('registerError');
+    var registerBtn = document.getElementById('registerBtn');
+
+    errDiv.textContent = '';
+
+    var email           = document.getElementById('email').value.trim();
+    var password        = document.getElementById('password').value;
+    var confirmPassword = document.getElementById('confirm_password').value;
+
+    /* Client-side pre-check (server repeats these) */
+    if (email.length > 50) {
+        errDiv.textContent = 'Email must be 50 characters or fewer.';
+        return;
+    }
+    if (password.length < 8) {
+        errDiv.textContent = 'Password must be at least 8 characters.';
+        return;
+    }
+    if (!/[a-zA-Z]/.test(password) || !/\d/.test(password)) {
+        errDiv.textContent = 'Password must contain both letters and numbers.';
+        return;
+    }
+    if (password !== confirmPassword) {
+        errDiv.textContent = 'Passwords do not match.';
+        return;
+    }
+
+    registerBtn.innerHTML = '<div class="loading-spinner"></div>';
+    registerBtn.disabled  = true;
+
+    try {
+        var res  = await fetch('/register', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ email, password, confirm_password: confirmPassword })
+        });
+        var data = await res.json();
+
+        if (data.success) {
+            window.location.href = data.redirect;
+        } else {
+            errDiv.textContent    = data.message;
+            registerBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Account';
+            registerBtn.disabled  = false;
+        }
+    } catch(err) {
+        errDiv.textContent    = 'Network error. Please try again.';
+        registerBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Account';
+        registerBtn.disabled  = false;
+    }
+});
+</script>
+</body>
+</html>
