@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Articles — NewsSphere</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        /* Anti-flash IIFE */
+        (function(){ if(localStorage.getItem('theme')==='light') document.body.classList.add('light-theme'); })();
+    </script>
+</head>
+<body>
+
+<!-- ═══════════════════════════ NAVBAR ═══════════════════════════ -->
+<nav class="navbar">
+
+    <div class="logo">
+        <i class="fa-solid fa-globe"></i>
+        <span class="newssphere">
+            <span class="news">News</span><span class="sphere">Sphere</span>
+        </span>
+    </div>
+
+    <div class="nav-icons">
+
+        <button id="theme-toggle" style="background:none;border:none;color:inherit;font-size:19px;cursor:pointer;">
+            <i class="fa-solid fa-moon"></i>
+        </button>
+
+        <a href="/domain" style="color:inherit;text-decoration:none;">
+            <i class="fa-solid fa-house"></i>
+        </a>
+
+        <a href="/saved" style="color:inherit;text-decoration:none;">
+            <i class="fa-solid fa-bookmark" style="color:var(--accent);"></i>
+        </a>
+
+    </div>
+
+    <div class="profile-menu">
+        <i class="fa-solid fa-user profile-icon"></i>
+        <div class="profile-dropdown">
+            <a href="/profile">
+                <i class="fa-solid fa-user"></i>
+                My Profile
+            </a>
+            <hr>
+            <a href="/logout" class="logout">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+            </a>
+        </div>
+    </div>
+
+</nav>
+
+<!-- ═══════════════════════════ MAIN ═══════════════════════════ -->
+<div class="container">
+
+    <!-- LEFT SIDEBAR -->
+    <div class="left-sidebar">
+        <ul>
+            <li><a href="/domain"                        style="color:inherit;text-decoration:none;display:block;width:100%;"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li><a href="/index?domain=job_seeker"       style="color:inherit;text-decoration:none;display:block;width:100%;"><i class="fa-solid fa-briefcase"></i> Jobs</a></li>
+            <li><a href="/index?domain=engineer"         style="color:inherit;text-decoration:none;display:block;width:100%;"><i class="fa-solid fa-microchip"></i> Technology</a></li>
+            <li><a href="/index?domain=student"          style="color:inherit;text-decoration:none;display:block;width:100%;"><i class="fa-solid fa-graduation-cap"></i> Education</a></li>
+            <li><a href="/index?domain=researcher"       style="color:inherit;text-decoration:none;display:block;width:100%;"><i class="fa-solid fa-heart"></i> Research</a></li>
+            <li><a href="/index?domain=investor"         style="color:inherit;text-decoration:none;display:block;width:100%;"><i class="fa-solid fa-chart-line"></i> Economy</a></li>
+            <li><a href="/index?domain=politician"       style="color:inherit;text-decoration:none;display:block;width:100%;"><i class="fa-solid fa-landmark"></i> Politics</a></li>
+            <li><a href="/index?domain=sports_fan"       style="color:inherit;text-decoration:none;display:block;width:100%;"><i class="fa-solid fa-futbol"></i> Sports</a></li>
+            <li style="background:#292158;color:#7357ff;">
+                <a href="/saved" style="color:inherit;text-decoration:none;display:block;width:100%;">
+                    <i class="fa-solid fa-bookmark"></i> Saved
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- SAVED FEED -->
+    <div class="feed">
+
+        <div class="selected-domain">
+            <h2>
+                <i class="fa-solid fa-bookmark" style="color:var(--accent);margin-right:10px;"></i>
+                Saved Articles
+            </h2>
+        </div>
+
+        {% if results %}
+            {% for result in results %}
+            <div class="card">
+
+                <!-- Card header: favicon + source + timestamp -->
+                <div class="card-header">
+                    <img src="https://www.google.com/s2/favicons?domain={{ result.source }}&sz=50"
+                         alt="{{ result.source }}"
+                         onerror="this.onerror=null; this.outerHTML=`<div style='width:45px;height:45px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#1c2147;border:2px solid #765cff;color:#765cff;font-size:20px;'><i class='fa-solid fa-bookmark'></i></div>`">
+                    <div>
+                        <h3>{{ result.source }}</h3>
+                        <small>Saved on {{ result.saved_at | string | truncate(16, True, '') }}</small>
+                    </div>
+                </div>
+
+                <!-- Title -->
+                <h2>
+                    <a href="{{ result.link }}" target="_blank" rel="noopener noreferrer"
+                       style="color:inherit;text-decoration:none;">
+                        {{ result.title }}
+                    </a>
+                </h2>
+
+                <!-- Snippet -->
+                <p>{{ result.snippet }}</p>
+
+                <!-- Action buttons -->
+                <div class="buttons">
+
+                    <button class="like"
+                            data-link="{{ result.link | e }}"
+                            data-liked="{{ 'true' if result.is_liked else 'false' }}"
+                            data-count="{{ result.like_count | default(0) }}"
+                            {% if result.is_liked %}style="color:#ff5c8a;"{% endif %}>
+                        {% if result.is_liked %}
+                            <i class="fa-solid fa-heart"></i> Liked{% if result.like_count and result.like_count > 1 %} <span class="action-count">{{ result.like_count }}</span>{% endif %}
+                        {% else %}
+                            <i class="fa-regular fa-heart"></i> Like{% if result.like_count and result.like_count > 1 %} <span class="action-count">{{ result.like_count }}</span>{% endif %}
+                        {% endif %}
+                    </button>
+
+                    <!-- Pre-filled as "Saved" since it's the saved page -->
+                    <button class="save"
+                            style="color:#1877f2;"
+                            data-title="{{ result.title | e }}"
+                            data-link="{{ result.link | e }}"
+                            data-snippet="{{ result.snippet | e }}"
+                            data-source="{{ result.source | e }}"
+                            data-saved="true"
+                            data-count="{{ result.save_count | default(1) }}">
+                        <i class="fa-solid fa-bookmark"></i> Saved{% if result.save_count and result.save_count > 1 %} <span class="action-count">{{ result.save_count }}</span>{% endif %}
+                    </button>
+
+                    <a href="{{ result.link }}" target="_blank" rel="noopener noreferrer"
+                       style="margin-left:auto; color:var(--accent); font-size:13px; text-decoration:none; display:flex; align-items:center; gap:6px;">
+                        Read Article <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+
+                </div>
+
+            </div>
+            {% endfor %}
+
+        {% else %}
+
+            <div class="card" style="padding:30px; text-align:center;">
+                <i class="fa-regular fa-bookmark" style="font-size:48px; color:var(--text-tertiary); margin-bottom:16px; display:block;"></i>
+                <h2 style="padding:0; margin-bottom:10px;">No saved articles yet</h2>
+                <p style="padding:0; margin-bottom:20px;">Articles you bookmark will appear here for easy access.</p>
+                <a href="/domain"
+                   style="display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border-radius:22px;background:var(--accent);color:#fff;text-decoration:none;font-weight:bold;font-size:14px;">
+                    <i class="fa-solid fa-compass"></i> Browse News
+                </a>
+            </div>
+
+        {% endif %}
+
+    </div><!-- /feed -->
+
+    <!-- RIGHT SIDEBAR -->
+    <div class="right-sidebar">
+        <h2>Quick Links</h2>
+        <p onclick="window.location.href='/domain'"><i class="fa-solid fa-compass" style="margin-right:8px;"></i>Browse News</p>
+        <p onclick="window.location.href='/profile'"><i class="fa-solid fa-user" style="margin-right:8px;"></i>Profile</p>
+        <hr>
+        <h2>Tips</h2>
+        <p style="cursor:default; font-size:13px; line-height:1.6; color:var(--text-tertiary);">
+            Click <i class="fa-regular fa-bookmark" style="color:var(--accent);"></i> on any article in the feed to save it here.
+        </p>
+    </div>
+
+</div><!-- /container -->
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsSphere — Live News &amp; Real-Time Insights</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        /* Anti-flash IIFE: apply stored theme BEFORE first paint */
+        (function(){ if(localStorage.getItem('theme')==='light') document.body.classList.add('light-theme'); })();
+    </script>
+</head>
+<body>
+
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fa-solid fa-globe"></i>
+        <span class="newssphere">
+            <span class="news">News</span><span class="sphere">Sphere</span>
+        </span>
+    </div>
+
+    <div class="nav-icons landing-nav-btns" style="gap: 15px !important; margin-left: auto; justify-content: flex-end;">
+        <button id="theme-toggle" style="background:none;border:none;color:inherit;font-size:19px;cursor:pointer;" title="Toggle dark/light theme">
+            <i class="fa-solid fa-moon"></i>
+        </button>
+        <a href="/login" style="color: var(--text-primary); text-decoration: none; font-weight: bold; padding: 8px 18px; border-radius: 20px; border: 1px solid var(--accent); transition: 0.3s; margin-right: 0 !important;">Login</a>
+        <a href="/register" style="background: var(--accent); color: white; text-decoration: none; font-weight: bold; padding: 8px 18px; border-radius: 20px; transition: 0.3s; margin-right: 0 !important;">Sign Up</a>
+    </div>
+</nav>
+
+<!-- ================= MAIN SURFING WRAPPER ================= -->
+<div class="landing-wrapper">
+
+    <!-- HERO SECTION -->
+    <div class="landing-hero">
+        <div class="hero-pill-tag">
+            <i class="fa-solid fa-bolt"></i> Live News Feed
+        </div>
+        <h1>Explore Today's Top Stories &amp; Headlines</h1>
+        <p>
+            Surf breaking news, deep-dive technology insights, market movements, space discoveries, and global affairs from trusted publishers worldwide.
+        </p>
+
+        <!-- LIVE SEARCH BAR -->
+        <div class="hero-search-container">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="landingSearchInput" placeholder="Search news by topic, keyword, source (e.g. AI, Sensex, Space, Cricket)..." value="{{ query | default('') }}" autocomplete="off">
+            <button type="button" id="clearSearchBtn" class="clear-btn" title="Clear search" style="display: {% if query %}flex{% else %}none{% endif %};">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- TRENDING TOPICS CHIPS -->
+        <div class="trending-topics-bar">
+            <span class="trending-label"><i class="fa-solid fa-arrow-trend-up"></i> Trending:</span>
+            <button type="button" class="topic-chip" data-query="AI">#AI</button>
+            <button type="button" class="topic-chip" data-query="NVIDIA">#NVIDIA</button>
+            <button type="button" class="topic-chip" data-query="Sensex">#StockMarket</button>
+            <button type="button" class="topic-chip" data-query="Gaganyaan">#Gaganyaan</button>
+            <button type="button" class="topic-chip" data-query="Cricket">#Cricket</button>
+            <button type="button" class="topic-chip" data-query="Scholarship">#Scholarships</button>
+            <button type="button" class="topic-chip" data-query="Renewable">#CleanEnergy</button>
+            <button type="button" class="topic-chip" data-query="Apple">#Apple</button>
+        </div>
+    </div>
+
+    <!-- CATEGORY NAVIGATION PILLS -->
+    <div class="category-pills-bar" id="categoryPills">
+        <button type="button" class="category-pill {% if not active_category or active_category == 'all' %}active{% endif %}" data-category="all">
+            <i class="fa-solid fa-layer-group"></i> All Stories
+        </button>
+        <button type="button" class="category-pill {% if active_category == 'technology' %}active{% endif %}" data-category="technology">
+            <i class="fa-solid fa-microchip"></i> Technology &amp; AI
+        </button>
+        <button type="button" class="category-pill {% if active_category == 'business' %}active{% endif %}" data-category="business">
+            <i class="fa-solid fa-chart-line"></i> Business &amp; Markets
+        </button>
+        <button type="button" class="category-pill {% if active_category == 'science' %}active{% endif %}" data-category="science">
+            <i class="fa-solid fa-rocket"></i> Science &amp; Space
+        </button>
+        <button type="button" class="category-pill {% if active_category == 'sports' %}active{% endif %}" data-category="sports">
+            <i class="fa-solid fa-futbol"></i> Sports
+        </button>
+        <button type="button" class="category-pill {% if active_category == 'education' %}active{% endif %}" data-category="education">
+            <i class="fa-solid fa-graduation-cap"></i> Education &amp; Careers
+        </button>
+        <button type="button" class="category-pill {% if active_category == 'politics' %}active{% endif %}" data-category="politics">
+            <i class="fa-solid fa-landmark"></i> World &amp; Politics
+        </button>
+    </div>
+
+    <!-- FEED STATUS HEADER -->
+    <div class="landing-feed-header">
+        <h2 id="feedHeaderTitle">
+            <i class="fa-regular fa-newspaper" style="color:var(--accent);"></i>
+            <span>Top Stories Today</span>
+        </h2>
+        <span class="story-count-badge" id="storyCountBadge">Showing {{ results|length }} stories</span>
+    </div>
+
+    <!-- NEWS CARDS GRID -->
+    <div class="landing-news-grid" id="newsGrid">
+        {% for result in results %}
+        <div class="landing-card"
+             data-id="{{ result.id }}"
+             data-category="{{ result.category | lower }}"
+             data-title="{{ result.title | lower }}"
+             data-snippet="{{ result.snippet | lower }}"
+             data-source="{{ result.source | lower }}"
+             data-tags="{{ result.tags | join(' ') | lower }}"
+             data-full-text="{{ result.long_desc | lower }}">
+
+            <!-- Card Header -->
+            <div class="landing-card-header">
+                <img src="https://www.google.com/s2/favicons?domain={{ result.source }}&sz=50"
+                     alt="{{ result.source }}"
+                     class="source-avatar"
+                     onerror="this.onerror=null; this.outerHTML=`<div class='source-fallback'><i class='fa-solid fa-newspaper'></i></div>`;">
+                <div class="source-meta">
+                    <h3>{{ result.source }}</h3>
+                    <span class="post-date"><i class="fa-regular fa-clock"></i> {{ result.published_at }}</span>
+                </div>
+                <span class="cat-badge cat-{{ result.category }}">{{ result.category_label }}</span>
+            </div>
+
+            <!-- Card Cover Image -->
+            {% if result.image %}
+            <div class="card-hero-img-wrap">
+                <img src="{{ result.image }}"
+                     alt="{{ result.title }}"
+                     class="card-hero-img"
+                     loading="lazy"
+                     onerror="this.parentElement.style.display='none';">
+                <span class="read-time-pill"><i class="fa-regular fa-clock"></i> {{ result.read_time }}</span>
+            </div>
+            {% endif %}
+
+            <!-- Card Body -->
+            <div class="landing-card-body">
+                <h2>
+                    <a href="{{ result.link }}" target="_blank" rel="noopener noreferrer">
+                        {{ result.title }}
+                    </a>
+                </h2>
+
+                <p class="card-snippet">{{ result.snippet }}</p>
+
+                <!-- Topic Tags -->
+                {% if result.tags %}
+                <div class="card-tags">
+                    {% for tag in result.tags %}
+                    <span class="card-tag" data-tag="{{ tag }}">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Expandable Full Story Container -->
+                <div class="expanded-story-box" style="display: none;">
+                    <p>{{ result.long_desc }}</p>
+                    <a href="{{ result.link }}" target="_blank" rel="noopener noreferrer" class="read-full-link">
+                        Read Original on {{ result.source }} <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card Actions Footer -->
+            <div class="landing-card-actions">
+                <button type="button" class="read-toggle-btn" title="Toggle full story preview">
+                    Read More <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <div class="card-interactive-btns">
+                    <button type="button" class="icon-action-btn card-like-btn" data-id="{{ result.id }}" data-count="{{ result.like_count | default(0) }}" title="Like this story (login required)">
+                        <i class="fa-regular fa-heart"></i>
+                        <span class="btn-text">Like{% if result.like_count and result.like_count > 1 %} <span class="action-count">{{ result.like_count }}</span>{% endif %}</span>
+                    </button>
+                    <button type="button" class="icon-action-btn card-save-btn" data-id="{{ result.id }}" data-count="{{ result.save_count | default(0) }}" title="Bookmark story (login required)">
+                        <i class="fa-regular fa-bookmark"></i>
+                        <span class="btn-text">Save{% if result.save_count and result.save_count > 1 %} <span class="action-count">{{ result.save_count }}</span>{% endif %}</span>
+                    </button>
+                    <button type="button" class="icon-action-btn card-share-btn" data-title="{{ result.title }}" data-link="{{ result.link }}" title="Copy link">
+                        <i class="fa-regular fa-share-from-square"></i>
+                    </button>
+                    <button type="button" class="icon-action-btn card-quick-read-btn" data-id="{{ result.id }}" title="Quick reader view">
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+        {% endfor %}
+
+        <!-- Empty State (shown when filters yield 0 results) -->
+        <div class="empty-news-box" id="emptyNewsBox" style="display: none;">
+            <i class="fa-regular fa-folder-open"></i>
+            <h3>No stories found</h3>
+            <p id="emptyNewsDesc">We couldn't find any news articles matching your search query.</p>
+            <button type="button" class="reset-search-btn" id="resetSearchBtn">
+                <i class="fa-solid fa-rotate-left"></i> Reset Search &amp; Filters
+            </button>
+        </div>
+    </div>
+
+    <!-- CTA BANNER FOR GUEST USERS -->
+    <div class="landing-cta-section">
+        <h2>Personalize Your Daily News Digest</h2>
+        <p>
+            Join NewsSphere to curate feeds specifically for your profession, save stories permanently across all devices, and stay ahead with real-time updates.
+        </p>
+        <div class="cta-button-group">
+            <a href="/register" class="cta-primary-btn">
+                Create Free Account <i class="fa-solid fa-arrow-right"></i>
+            </a>
+            <a href="/login" class="cta-secondary-btn">Log In</a>
+        </div>
+    </div>
+
+</div><!-- /landing-wrapper -->
+
+<!-- QUICK READ MODAL -->
+<div class="reader-modal-overlay" id="readerModalOverlay" style="display: none;">
+    <div class="reader-modal-content">
+        <div class="modal-header-bar">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span id="modalCategoryBadge" class="cat-badge cat-technology">Technology</span>
+                <span id="modalSourceTime" style="font-size:12px;color:var(--text-tertiary);"></span>
+            </div>
+            <button type="button" class="modal-close-button" id="closeModalBtn" title="Close reader">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="modal-body-content">
+            <img id="modalBannerImg" src="" alt="" class="modal-banner-img" style="display:none;">
+            <h2 id="modalArticleTitle" class="modal-title"></h2>
+            <div id="modalArticleTags" class="card-tags" style="margin-bottom:18px;"></div>
+            <p id="modalArticleText" class="modal-story-text"></p>
+            <a id="modalExternalLink" href="#" target="_blank" rel="noopener noreferrer" class="read-full-link">
+                Read Complete Story on Publisher Website <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST NOTIFICATION SHELF -->
+<div class="toast-shelf" id="toastShelf"></div>
+
+<!-- Embedded Data for Instant Client-Side Surfing & Reader Modal -->
+<script id="newsDataJson" type="application/json">
+{{ results | tojson }}
+</script>
+
+<!-- ================= CLIENT JAVASCRIPT ================= -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* ─── 1. Load Data ────────────────────────────────────────── */
+    var rawJson = document.getElementById('newsDataJson');
+    var allStories = [];
+    try {
+        allStories = JSON.parse(rawJson.textContent || '[]');
+    } catch (e) {
+        allStories = [];
+    }
+
+    var storyMap = {};
+    allStories.forEach(function(s) {
+        if (s.id) storyMap[s.id] = s;
+    });
+
+    /* ─── 2. DOM Elements ─────────────────────────────────────── */
+    var searchInput   = document.getElementById('landingSearchInput');
+    var clearSearchBtn = document.getElementById('clearSearchBtn');
+    var categoryPills = document.querySelectorAll('.category-pill');
+    var newsCards     = document.querySelectorAll('.landing-card');
+    var storyCounter  = document.getElementById('storyCountBadge');
+    var feedHeader    = document.getElementById('feedHeaderTitle');
+    var emptyBox      = document.getElementById('emptyNewsBox');
+    var emptyDesc     = document.getElementById('emptyNewsDesc');
+    var resetBtn      = document.getElementById('resetSearchBtn');
+    var toastShelf    = document.getElementById('toastShelf');
+
+    var currentCategory = 'all';
+    var currentQuery    = (searchInput.value || '').trim();
+
+    /* ─── 3. Category Title Mapping ──────────────────────────── */
+    var catTitleMap = {
+        'all':        'Top Stories Today',
+        'technology': 'Technology & AI News',
+        'business':   'Business & Market Updates',
+        'science':    'Science & Space Discoveries',
+        'sports':     'Sports & Athletics Headlines',
+        'education':  'Education & Career Opportunities',
+        'politics':   'World Affairs & Policy News'
+    };
+
+    /* ─── 4. Filter & Update Feed ────────────────────────────── */
+    function filterFeed() {
+        var queryTokens = currentQuery.toLowerCase().split(/\s+/).filter(function(t) { return t.length > 0; });
+        var visibleCount = 0;
+
+        newsCards.forEach(function (card) {
+            var cardCat    = card.getAttribute('data-category') || '';
+            var cardTitle  = card.getAttribute('data-title') || '';
+            var cardSnippet= card.getAttribute('data-snippet') || '';
+            var cardSource = card.getAttribute('data-source') || '';
+            var cardTags   = card.getAttribute('data-tags') || '';
+            var cardText   = card.getAttribute('data-full-text') || '';
+
+            var matchesCategory = (currentCategory === 'all' || cardCat === currentCategory);
+
+            var matchesQuery = true;
+            if (queryTokens.length > 0) {
+                var corpus = (cardTitle + ' ' + cardSnippet + ' ' + cardSource + ' ' + cardTags + ' ' + cardText).toLowerCase();
+                matchesQuery = queryTokens.some(function(token) {
+                    if (token.length <= 3) {
+                        var regex = new RegExp('\\b' + token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+                        return regex.test(corpus);
+                    }
+                    return corpus.indexOf(token) !== -1;
+                });
+            }
+
+            if (matchesCategory && matchesQuery) {
+                card.style.display = 'flex';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        // Update counter and header
+        var headerText = catTitleMap[currentCategory] || 'Curated Stories';
+        if (currentQuery) {
+            headerText += ' for "' + currentQuery + '"';
+        }
+        if (feedHeader) {
+            var titleSpan = feedHeader.querySelector('span');
+            if (titleSpan) titleSpan.textContent = headerText;
+        }
+
+        if (storyCounter) {
+            storyCounter.textContent = 'Showing ' + visibleCount + ' ' + (visibleCount === 1 ? 'story' : 'stories');
+        }
+
+        // Handle Empty State
+        if (visibleCount === 0) {
+            emptyBox.style.display = 'block';
+            if (emptyDesc) {
+                emptyDesc.textContent = currentQuery 
+                    ? 'No news found matching "' + currentQuery + '" in this category. Try adjusting your search term.' 
+                    : 'No stories available in this category.';
+            }
+        } else {
+            emptyBox.style.display = 'none';
+        }
+    }
+
+    /* ─── 5. Search Input Handlers ───────────────────────────── */
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            currentQuery = this.value.trim();
+            if (clearSearchBtn) {
+                clearSearchBtn.style.display = currentQuery ? 'flex' : 'none';
+            }
+            filterFeed();
+        });
+    }
+
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener('click', function () {
+            searchInput.value = '';
+            currentQuery = '';
+            this.style.display = 'none';
+            searchInput.focus();
+            filterFeed();
+        });
+    }
+
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function () {
+            searchInput.value = '';
+            currentQuery = '';
+            if (clearSearchBtn) clearSearchBtn.style.display = 'none';
+            currentCategory = 'all';
+            categoryPills.forEach(function (p) {
+                p.classList.toggle('active', p.getAttribute('data-category') === 'all');
+            });
+            filterFeed();
+        });
+    }
+
+    /* ─── 6. Category Pill Clicks ────────────────────────────── */
+    categoryPills.forEach(function (pill) {
+        pill.addEventListener('click', function () {
+            categoryPills.forEach(function (p) { p.classList.remove('active'); });
+            this.classList.add('active');
+            currentCategory = this.getAttribute('data-category') || 'all';
+            filterFeed();
+        });
+    });
+
+    /* ─── 7. Trending Topic Chips ────────────────────────────── */
+    document.querySelectorAll('.topic-chip').forEach(function (chip) {
+        chip.addEventListener('click', function () {
+            var q = this.getAttribute('data-query') || this.textContent.replace('#', '').trim();
+            searchInput.value = q;
+            currentQuery = q;
+            if (clearSearchBtn) clearSearchBtn.style.display = 'flex';
+            filterFeed();
+            searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    });
+
+    /* ─── 8. Card Tag Clicks ─────────────────────────────────── */
+    document.querySelectorAll('.card-tag').forEach(function (tag) {
+        tag.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var rawTag = (this.getAttribute('data-tag') || this.textContent).replace('#', '').trim();
+            searchInput.value = rawTag;
+            currentQuery = rawTag;
+            if (clearSearchBtn) clearSearchBtn.style.display = 'flex';
+            filterFeed();
+        });
+    });
+
+    /* ─── 9. Read More (In-Card Expand) ──────────────────────── */
+    document.querySelectorAll('.read-toggle-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var card = this.closest('.landing-card');
+            var expandBox = card.querySelector('.expanded-story-box');
+            if (!expandBox) return;
+
+            var isOpen = expandBox.style.display === 'block';
+            expandBox.style.display = isOpen ? 'none' : 'block';
+            this.innerHTML = isOpen 
+                ? 'Read More <i class="fa-solid fa-chevron-down"></i>' 
+                : 'Read Less <i class="fa-solid fa-chevron-up"></i>';
+        });
+    });
+
+    /* ─── 10. Like & Save (Only allowed after login) ────────── */
+    document.querySelectorAll('.card-like-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            btn.classList.remove('btn-lock-shake');
+            void btn.offsetWidth;
+            btn.classList.add('btn-lock-shake');
+            showToast('<i class="fa-solid fa-lock" style="color:var(--accent);margin-right:6px;"></i> Liking is only allowed after login. <a href="/login" style="color:var(--accent);font-weight:bold;margin-left:8px;text-decoration:underline;">Log in</a>');
+        });
+    });
+
+    document.querySelectorAll('.card-save-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            btn.classList.remove('btn-lock-shake');
+            void btn.offsetWidth;
+            btn.classList.add('btn-lock-shake');
+            showToast('<i class="fa-solid fa-lock" style="color:var(--accent);margin-right:6px;"></i> Saving is only allowed after login. <a href="/login" style="color:var(--accent);font-weight:bold;margin-left:8px;text-decoration:underline;">Log in</a>');
+        });
+    });
+
+    /* ─── 12. Share Button (Clipboard Copy) ─────────────────── */
+    document.querySelectorAll('.card-share-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var link = this.getAttribute('data-link') || window.location.href;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(link).then(function () {
+                    showToast('Link copied to clipboard! 📋');
+                }).catch(function () {
+                    showToast('Sharing link: ' + link);
+                });
+            } else {
+                showToast('Story link: ' + link);
+            }
+        });
+    });
+
+    /* ─── 13. Quick Read Modal ───────────────────────────────── */
+    var modalOverlay  = document.getElementById('readerModalOverlay');
+    var closeModalBtn = document.getElementById('closeModalBtn');
+    var modalTitle    = document.getElementById('modalArticleTitle');
+    var modalText     = document.getElementById('modalArticleText');
+    var modalImg      = document.getElementById('modalBannerImg');
+    var modalCatBadge = document.getElementById('modalCategoryBadge');
+    var modalTime     = document.getElementById('modalSourceTime');
+    var modalLink     = document.getElementById('modalExternalLink');
+    var modalTagsWrap = document.getElementById('modalArticleTags');
+
+    document.querySelectorAll('.card-quick-read-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var id = this.getAttribute('data-id');
+            var story = storyMap[id];
+            if (!story) return;
+
+            if (modalTitle) modalTitle.textContent = story.title;
+            if (modalText) modalText.textContent = story.long_desc || story.snippet;
+            if (modalCatBadge) {
+                modalCatBadge.className = 'cat-badge cat-' + (story.category || 'technology');
+                modalCatBadge.textContent = story.category_label || 'News';
+            }
+            if (modalTime) {
+                modalTime.textContent = (story.source || '') + ' · ' + (story.published_at || '') + ' · ' + (story.read_time || '');
+            }
+            if (modalLink) {
+                modalLink.href = story.link || '#';
+            }
+            if (modalImg) {
+                if (story.image) {
+                    modalImg.src = story.image;
+                    modalImg.alt = story.title;
+                    modalImg.style.display = 'block';
+                } else {
+                    modalImg.style.display = 'none';
+                }
+            }
+            if (modalTagsWrap) {
+                modalTagsWrap.innerHTML = '';
+                (story.tags || []).forEach(function (t) {
+                    var s = document.createElement('span');
+                    s.className = 'card-tag';
+                    s.textContent = t;
+                    modalTagsWrap.appendChild(s);
+                });
+            }
+
+            modalOverlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        });
+    });
+
+    function closeModal() {
+        modalOverlay.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', function (e) {
+            if (e.target === modalOverlay) closeModal();
+        });
+    }
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modalOverlay && modalOverlay.style.display === 'flex') {
+            closeModal();
+        }
+    });
+
+    /* ─── 14. Toast Notification System ──────────────────────── */
+    function showToast(message) {
+        if (!toastShelf) return;
+        var toast = document.createElement('div');
+        toast.className = 'toast-msg';
+        toast.innerHTML = '<i class="fa-solid fa-circle-check" style="color:var(--accent);"></i> ' + message;
+        toastShelf.appendChild(toast);
+
+        setTimeout(function () {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.3s ease';
+            setTimeout(function () { toast.remove(); }, 300);
+        }, 3200);
+    }
+
+});
+</script>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
